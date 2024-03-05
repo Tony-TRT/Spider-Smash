@@ -15,8 +15,8 @@ class Game:
         pygame.init()
         self.game_over: bool = False
         self.active_menu: bool = True
-        self.game_menu = GameMenu()
         self.display_surface = pygame.display.set_mode((900, 450))
+        self.game_menu = GameMenu()
         pygame.display.set_caption("Spider Smash")
 
     def display_menu(self):
