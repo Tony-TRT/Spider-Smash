@@ -5,6 +5,8 @@ This module serves as the core module of the game, containing essential elements
 import sys
 import pygame
 
+from modules.menu import GameMenu
+
 
 class Game:
 
@@ -13,8 +15,14 @@ class Game:
         pygame.init()
         self.game_over: bool = False
         self.active_menu: bool = True
+        self.game_menu = GameMenu()
         self.display_surface = pygame.display.set_mode((900, 450))
         pygame.display.set_caption("Spider Smash")
+
+    def display_menu(self):
+
+        self.game_menu.display()
+        self.game_menu.update()
 
     @staticmethod
     def handle_close_event() -> None:
@@ -37,8 +45,7 @@ class Game:
 
             elif self.active_menu:
 
-                pass
-                # Menu
+                self.display_menu()
 
             else:
 
