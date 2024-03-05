@@ -11,7 +11,7 @@ class Game:
     def __init__(self):
 
         pygame.init()
-        self.display_surface = pygame.display.set_mode((800, 400))
+        self.display_surface = pygame.display.set_mode((900, 450))
         pygame.display.set_caption("Spider Smash")
 
     @staticmethod
