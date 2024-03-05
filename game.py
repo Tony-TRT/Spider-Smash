@@ -11,6 +11,8 @@ class Game:
     def __init__(self):
 
         pygame.init()
+        self.game_over: bool = False
+        self.active_menu: bool = True
         self.display_surface = pygame.display.set_mode((900, 450))
         pygame.display.set_caption("Spider Smash")
 
@@ -27,6 +29,21 @@ class Game:
         while True:
 
             self.handle_close_event()
+
+            if self.game_over:
+
+                pass
+                # Game Over
+
+            elif self.active_menu:
+
+                pass
+                # Menu
+
+            else:
+
+                pass
+                # Game
 
             pygame.display.update()
 
