@@ -47,11 +47,13 @@ class Game:
             elif self.active_menu:
 
                 self.display_menu()
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_SPACE]:
+                    self.active_menu = False
 
             else:
 
-                pass
-                # Game
+                self.display_surface.fill("black")
 
             pygame.display.update()
             self.clock.tick(60)
