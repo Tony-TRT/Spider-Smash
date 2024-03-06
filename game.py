@@ -6,6 +6,7 @@ import sys
 import pygame
 
 from modules.menu import GameMenu
+from modules.player import Player
 
 
 class Game:
@@ -18,6 +19,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.display_surface = pygame.display.set_mode((900, 450))
         self.game_menu = GameMenu()
+        self.player = Player()
         pygame.display.set_caption("Spider Smash")
 
     def display_menu(self):
@@ -54,6 +56,8 @@ class Game:
             else:
 
                 self.display_surface.fill("black")
+                self.player.display()
+                self.player.update()
 
             pygame.display.update()
             self.clock.tick(60)
