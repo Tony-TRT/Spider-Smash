@@ -18,6 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.velocity: int = 3
         self.stamina: int = 100
         self.stamina_rect = None
+        self.hearts: list = [pygame.rect.Rect(20 + (i * 40), 20, 20, 20) for i in range(5)]
         self.dead_zone: int = 10
         self.images: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "player"), alpha=True)
         self.image = None
@@ -29,6 +30,9 @@ class Player(pygame.sprite.Sprite):
 
         pygame.draw.rect(self.display_surface, (255, 255, 255), self.rect)
         pygame.draw.rect(self.display_surface, (0, 0, 255), self.stamina_rect)
+
+        for heart in self.hearts:
+            pygame.draw.rect(self.display_surface, (255, 0, 0), heart)
 
     def update(self):
 
