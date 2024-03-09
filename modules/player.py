@@ -16,7 +16,7 @@ class Player(pygame.sprite.Sprite):
 
         self.display_surface = pygame.display.get_surface()
         self.velocity: int = 3
-        self.stamina: int = 100
+        self.stamina: float = 100
         self.stamina_rect = None
         self.hearts: list = [pygame.rect.Rect(20 + (i * 40), 20, 20, 20) for i in range(5)]
         self.dead_zone: int = 10
@@ -58,9 +58,9 @@ class Player(pygame.sprite.Sprite):
 
         press_run = pygame.mouse.get_pressed()[2]
 
-        if press_run and self.stamina:
+        if press_run and self.stamina > 0:
             self.velocity = 7
             self.stamina -= 1
         else:
             self.velocity = 3
-            self.stamina = self.stamina + 1 if self.stamina < 100 and not press_run else self.stamina
+            self.stamina = self.stamina + 0.2 if self.stamina < 100 and not press_run else self.stamina
