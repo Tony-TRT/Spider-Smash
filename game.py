@@ -36,6 +36,8 @@ class Game:
 
         while True:
 
+            keys = pygame.key.get_pressed()
+
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -53,7 +55,6 @@ class Game:
             elif self.active_menu:  # Menu.
 
                 self.display_menu()
-                keys = pygame.key.get_pressed()
                 if keys[pygame.K_SPACE]:
                     self.active_menu = False
 
