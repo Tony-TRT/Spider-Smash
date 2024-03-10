@@ -1,6 +1,8 @@
 import pygame
 from random import randint, choice
 
+from modules.toolkit import calculate_movement
+
 
 class Spider(pygame.sprite.Sprite):
 
@@ -21,15 +23,7 @@ class Spider(pygame.sprite.Sprite):
 
         pygame.draw.rect(self.display_surface, (0, 255, 0), self.rect)
 
-    def update(self, player_x_pos, player_y_pos):
+    def update(self, player_position: tuple[int, int]):
 
-        dx = player_x_pos - self.rect.centerx
-        dy = player_y_pos - self.rect.centery
-
-        distance: float = ((dx ** 2) + (dy ** 2)) ** 0.5
-
-        if distance > 0:
-            mov_x = dx / distance * self.velocity
-            mov_y = dy / distance * self.velocity
-
-            self.rect.move_ip(mov_x, mov_y)
+        mov_x, mov_y = calculate_movement(player_position, self.rect, 15, self.velocity)
+        self.rect.move_ip(mov_x, mov_y)

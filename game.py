@@ -64,7 +64,7 @@ class Game:
                 for spider in self.spiders:
 
                     spider.display()
-                    spider.update(self.player.rect.centerx, self.player.rect.centery)
+                    spider.update(self.player.rect.center)
 
                 self.player.display()
                 self.player.update()
