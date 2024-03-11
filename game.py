@@ -8,6 +8,7 @@ import pygame
 from modules.menu import GameMenu
 from modules.player import Player
 from modules.spiders import Spider
+from modules.weapons import Bullet
 
 
 class Game:
@@ -22,6 +23,7 @@ class Game:
         self.game_menu = GameMenu()
         self.player = Player()
         self.spiders: list = []
+        self.bullets: list = []
         pygame.display.set_caption("Spider Smash")
 
     def display_menu(self):
@@ -69,6 +71,13 @@ class Game:
 
                 self.player.display()
                 self.player.update()
+
+                if keys[pygame.K_SPACE]:
+                    self.bullets.append(Bullet(self.player.rect.center))
+
+                for bullet in self.bullets:
+                    bullet.display()
+                    bullet.update()
 
             pygame.display.update()
             self.clock.tick(60)
