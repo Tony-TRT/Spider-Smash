@@ -7,8 +7,8 @@ import pygame
 
 from modules.menu import GameMenu
 from modules.player import Player
-from modules.spiders import Spider
-from modules.weapons import Bullet
+from modules.spiders import Spider, spider_sprites
+from modules.weapons import Bullet, bullet_sprites
 
 
 class Game:
@@ -22,8 +22,6 @@ class Game:
         self.display_surface = pygame.display.set_mode((900, 450))
         self.game_menu = GameMenu()
         self.player = Player()
-        self.spiders: list = []
-        self.bullets: list = []
         pygame.display.set_caption("Spider Smash")
 
     def display_menu(self):
@@ -47,7 +45,7 @@ class Game:
                     sys.exit()
 
                 if event.type == spider_spawn and not self.active_menu and not self.game_over:
-                    self.spiders.append(Spider())
+                    spider_sprites.add(Spider())
 
             if self.game_over:
 
@@ -57,6 +55,7 @@ class Game:
             elif self.active_menu:  # Menu.
 
                 self.display_menu()
+
                 if keys[pygame.K_SPACE]:
                     self.active_menu = False
 
@@ -64,20 +63,19 @@ class Game:
 
                 self.display_surface.fill("black")
 
-                for spider in self.spiders:
-
-                    spider.display()
-                    spider.update(self.player.rect.center)
+                spider_sprites.draw(self.display_surface)
+                spider_sprites.update(self.player.rect.center)
 
                 self.player.display()
                 self.player.update()
 
                 if keys[pygame.K_SPACE]:
-                    self.bullets.append(Bullet(self.player.rect.center))
+                    bullet_sprites.add(Bullet(self.player.rect.center))
 
-                for bullet in self.bullets:
-                    bullet.display()
-                    bullet.update()
+                bullet_sprites.draw(self.display_surface)
+                bullet_sprites.update()
+
+                pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
 
             pygame.display.update()
             self.clock.tick(60)

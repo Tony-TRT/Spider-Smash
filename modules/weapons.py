@@ -1,5 +1,11 @@
 import pygame
 from math import atan2, cos, sin
+from pathlib import Path
+
+from modules import constants
+
+
+bullet_sprites = pygame.sprite.Group()
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -7,29 +13,29 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, player_pos: tuple):
         super().__init__()
 
-        self.display_surface = pygame.display.get_surface()
-        self.speed: int = 20
-        self.image = None
-        self.rect = pygame.rect.Rect(*player_pos, 5, 5)
+        image = pygame.image.load(Path(constants.GRAPHICS_DIR / "weapons" / "fireball.png"))
+        image.set_colorkey((0, 0, 0))
 
         self.initial_mouse_pos: tuple[int, int] = pygame.mouse.get_pos()
-        self.initial_player_pos: tuple = player_pos
-        distance_x = self.initial_mouse_pos[0] - self.initial_player_pos[0]
-        distance_y = self.initial_mouse_pos[1] - self.initial_player_pos[1]
+        self.spawn_position: tuple[int, int] = (player_pos[0] - 8, player_pos[1] - 8)
+
+        self.display_surface = pygame.display.get_surface()
+        self.speed: int = 20
+        self.image = image
+        self.rect = pygame.rect.Rect(*self.spawn_position, 5, 5)
+
+        distance_x = self.initial_mouse_pos[0] - self.spawn_position[0]
+        distance_y = self.initial_mouse_pos[1] - self.spawn_position[1]
         angle: float = atan2(distance_y, distance_x)
 
         self.speed_x = self.speed * cos(angle)
         self.speed_y = self.speed * sin(angle)
         self.bullet_repr: list = [
-            self.initial_player_pos[0],
-            self.initial_player_pos[1],
+            self.spawn_position[0],
+            self.spawn_position[1],
             self.speed_x,
             self.speed_y
         ]
-
-    def display(self):
-
-        pygame.draw.circle(self.display_surface, (255, 0, 0), self.rect.center, 8)
 
     def update(self):
 

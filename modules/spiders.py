@@ -1,7 +1,12 @@
 import pygame
 from random import randint, choice
+from pathlib import Path
 
-from modules.toolkit import calculate_movement
+from modules import constants
+from modules.toolkit import calculate_movement, load_images
+
+
+spider_sprites = pygame.sprite.Group()
 
 
 class Spider(pygame.sprite.Sprite):
@@ -12,16 +17,13 @@ class Spider(pygame.sprite.Sprite):
         self.display_surface = pygame.display.get_surface()
         self.velocity: int = 2
 
-        random_x_spawn: tuple = (randint(-100, -32), randint(932, 1000))
-        random_y_spawn: tuple = (randint(-100, -32), randint(482, 550))
+        random_x_spawn: tuple[int, int] = (randint(-100, -32), randint(932, 1000))
+        random_y_spawn: tuple[int, int] = (randint(-100, -32), randint(482, 550))
         xy_spawn: tuple[int: int] = (choice(random_x_spawn), choice(random_y_spawn))
 
-        self.image = None
+        self.images: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "spiders"), alpha=True)
+        self.image = self.images.get("sample")
         self.rect = pygame.rect.Rect(*xy_spawn, 32, 32)
-
-    def display(self):
-
-        pygame.draw.rect(self.display_surface, (0, 255, 0), self.rect)
 
     def update(self, player_position: tuple[int, int]):
 
