@@ -6,7 +6,7 @@ import sys
 import pygame
 
 from modules.menu import GameMenu
-from modules.player import Player
+from modules.player import Player, player_sprite
 from modules.spiders import Spider, spider_sprites
 from modules.weapons import Bullet, bullet_sprites
 
@@ -22,6 +22,7 @@ class Game:
         self.display_surface = pygame.display.set_mode((900, 450))
         self.game_menu = GameMenu()
         self.player = Player()
+        player_sprite.add(self.player)
         pygame.display.set_caption("Spider Smash")
 
     def display_menu(self):
@@ -47,10 +48,9 @@ class Game:
                 if event.type == spider_spawn and not self.active_menu and not self.game_over:
                     spider_sprites.add(Spider())
 
-            if self.game_over:
+            if self.game_over:  # Game Over.
 
-                pass
-                # Game Over
+                self.display_surface.fill("black")
 
             elif self.active_menu:  # Menu.
 
@@ -66,8 +66,9 @@ class Game:
                 spider_sprites.draw(self.display_surface)
                 spider_sprites.update(self.player.rect.center)
 
-                self.player.display()
-                self.player.update()
+                self.player.display_hud()
+                player_sprite.draw(self.display_surface)
+                player_sprite.update()
 
                 if keys[pygame.K_SPACE]:
                     bullet_sprites.add(Bullet(self.player.rect.center))
@@ -76,6 +77,12 @@ class Game:
                 bullet_sprites.update()
 
                 pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
+
+                if pygame.sprite.groupcollide(player_sprite, spider_sprites, False, False):
+                    try:
+                        self.player.hearts.pop()
+                    except IndexError:
+                        self.game_over = True
 
             pygame.display.update()
             self.clock.tick(60)

@@ -9,6 +9,9 @@ from modules import constants
 from modules.toolkit import load_images, calculate_movement
 
 
+player_sprite = pygame.sprite.GroupSingle()
+
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -21,14 +24,12 @@ class Player(pygame.sprite.Sprite):
         self.hearts: list = [pygame.rect.Rect(20 + (i * 40), 20, 20, 20) for i in range(5)]
         self.dead_zone: int = 10
         self.images: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "player"), alpha=True)
-        self.image = None
+        self.image = self.images.get("sample")
         self.rect = pygame.rect.Rect(434, 209, 32, 32)
 
-    def display(self):
+    def display_hud(self):
 
         self.stamina_rect = pygame.rect.Rect(680, 20, self.stamina * 2, 20)
-
-        pygame.draw.rect(self.display_surface, (255, 255, 255), self.rect)
         pygame.draw.rect(self.display_surface, (0, 0, 255), self.stamina_rect)
 
         for heart in self.hearts:
