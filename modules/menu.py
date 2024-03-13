@@ -47,7 +47,7 @@ class GameMenu:
 
     def display(self):
 
-        self.display_surface.fill("black")
+        self.display_surface.fill((0, 0, 0))
         self.display_surface.blit(self.images.get("background"), self.background_rect)
         self.display_surface.blit(self.images.get("title_background"), self.game_title_background_rect)
         self.display_surface.blit(self.game_title, self.game_title_rect)

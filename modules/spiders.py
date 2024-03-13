@@ -14,7 +14,6 @@ class Spider(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.display_surface = pygame.display.get_surface()
         self.velocity: int = 2
 
         random_x_spawn: tuple[int, int] = (randint(-100, -32), randint(932, 1000))
