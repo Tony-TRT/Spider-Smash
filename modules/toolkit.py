@@ -6,6 +6,17 @@ import pygame
 from pygame.rect import Rect
 from pathlib import Path
 from math import sqrt
+from enum import Enum, auto
+
+
+class GameState(Enum):
+    """
+    Enumeration representing different states of the game.
+    """
+
+    ACTIVE = auto()
+    MENU = auto()
+    OVER = auto()
 
 
 def load_images(folder: Path, alpha: bool = False) -> dict:

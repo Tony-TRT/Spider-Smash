@@ -9,6 +9,7 @@ from modules.menu import GameMenu
 from modules.player import Player, player_sprite
 from modules.spiders import Spider, spider_sprites
 from modules.weapons import Bullet, bullet_sprites
+from modules.toolkit import GameState
 
 
 class Game:
@@ -16,8 +17,7 @@ class Game:
     def __init__(self):
 
         pygame.init()
-        self.game_over: bool = False
-        self.active_menu: bool = True
+        self.state = GameState.MENU
         self.clock = pygame.time.Clock()
         self.display_surface = pygame.display.set_mode((900, 450))
         self.game_menu = GameMenu()
@@ -45,19 +45,19 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-                if event.type == spider_spawn and not self.active_menu and not self.game_over:
+                if event.type == spider_spawn and self.state == GameState.ACTIVE:
                     spider_sprites.add(Spider())
 
-            if self.game_over:  # Game Over.
+            if self.state == GameState.OVER:  # Game Over.
 
                 self.display_surface.fill("black")
 
-            elif self.active_menu:  # Menu.
+            elif self.state == GameState.MENU:  # Menu.
 
                 self.display_menu()
 
                 if keys[pygame.K_SPACE]:
-                    self.active_menu = False
+                    self.state = GameState.ACTIVE
 
             else:  # Game.
 
@@ -82,7 +82,7 @@ class Game:
                     try:
                         self.player.hearts.pop()
                     except IndexError:
-                        self.game_over = True
+                        self.state = GameState.OVER
 
             pygame.display.update()
             self.clock.tick(60)
