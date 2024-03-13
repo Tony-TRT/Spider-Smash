@@ -55,20 +55,24 @@ class Game:
         self.menu.display()
         self.menu.update()
 
+    def handle_events(self) -> None:
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == self.event_spider_spawn and self.state == GameState.ACTIVE:
+                spider_sprites.add(Spider())
+
     def run(self) -> None:
 
         while True:
 
             keys = pygame.key.get_pressed()
 
-            for event in pygame.event.get():
-
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-
-                if event.type == self.event_spider_spawn and self.state == GameState.ACTIVE:
-                    spider_sprites.add(Spider())
+            self.handle_events()
 
             if self.state == GameState.OVER:  # Game Over.
 
