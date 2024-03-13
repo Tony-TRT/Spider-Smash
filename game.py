@@ -66,11 +66,14 @@ class Game:
             if event.type == self.event_spider_spawn and self.state == GameState.ACTIVE:
                 spider_sprites.add(Spider())
 
+    @property
+    def keys(self):
+
+        return pygame.key.get_pressed()
+
     def run(self) -> None:
 
         while True:
-
-            keys = pygame.key.get_pressed()
 
             self.handle_events()
 
@@ -82,7 +85,7 @@ class Game:
 
                 self.display_menu()
 
-                if keys[pygame.K_SPACE]:
+                if self.keys[pygame.K_SPACE]:
                     self.state = GameState.ACTIVE
 
             else:  # Game.
@@ -96,7 +99,7 @@ class Game:
                 player_sprite.draw(self.display_surface)
                 player_sprite.update()
 
-                if keys[pygame.K_SPACE]:
+                if self.keys[pygame.K_SPACE]:
                     bullet_sprites.add(Bullet(self.player.rect.center))
 
                 bullet_sprites.draw(self.display_surface)
