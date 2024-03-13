@@ -16,24 +16,46 @@ class Game:
 
     def __init__(self):
 
+        ##############################
+        # Basic required code.
+        ##############################
+
         pygame.init()
-        self.state = GameState.MENU
-        self.clock = pygame.time.Clock()
+
         self.display_surface = pygame.display.set_mode((900, 450))
-        self.game_menu = GameMenu()
-        self.player = Player()
-        player_sprite.add(self.player)
+        self.clock = pygame.time.Clock()
+
         pygame.display.set_caption("Spider Smash")
 
-    def display_menu(self):
+        ##############################
+        # Useful variables.
+        ##############################
 
-        self.game_menu.display()
-        self.game_menu.update()
+        self.state = GameState.MENU
+
+        ##############################
+        # Game elements.
+        ##############################
+
+        self.player = Player()
+        self.menu = GameMenu()
+
+        player_sprite.add(self.player)
+
+        ##############################
+        # Events.
+        ##############################
+
+        self.event_spider_spawn = pygame.USEREVENT + 1
+
+        pygame.time.set_timer(self.event_spider_spawn, 500)
+
+    def display_menu(self) -> None:
+
+        self.menu.display()
+        self.menu.update()
 
     def run(self) -> None:
-
-        spider_spawn = pygame.USEREVENT + 1
-        pygame.time.set_timer(spider_spawn, 500)
 
         while True:
 
@@ -45,7 +67,7 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-                if event.type == spider_spawn and self.state == GameState.ACTIVE:
+                if event.type == self.event_spider_spawn and self.state == GameState.ACTIVE:
                     spider_sprites.add(Spider())
 
             if self.state == GameState.OVER:  # Game Over.
