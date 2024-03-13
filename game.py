@@ -57,14 +57,14 @@ class Game:
 
     def handle_events(self) -> None:
 
-        for event in pygame.event.get():
+        event: pygame.event.Event = pygame.event.poll()
 
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
-            if event.type == self.event_spider_spawn and self.state == GameState.ACTIVE:
-                spider_sprites.add(Spider())
+        if event.type == self.event_spider_spawn and self.state == GameState.ACTIVE:
+            spider_sprites.add(Spider())
 
     @property
     def keys(self):
