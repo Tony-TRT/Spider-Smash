@@ -32,6 +32,11 @@ class Game:
         ##############################
 
         self.state = GameState.MENU
+        self.game_state_action: dict = {
+            GameState.ACTIVE: self.do_game,
+            GameState.MENU: self.do_menu,
+            GameState.OVER: self.do_game_over
+        }
 
         ##############################
         # Game elements.
@@ -55,15 +60,51 @@ class Game:
         self.menu.display()
         self.menu.update()
 
+    def do_game(self) -> None:
+
+        self.display_surface.fill((0, 0, 0))
+
+        if self.keys[pygame.K_SPACE]:
+            bullet_sprites.add(Bullet(self.player.rect.center))
+
+        spider_sprites.draw(self.display_surface)
+        player_sprite.draw(self.display_surface)
+        bullet_sprites.draw(self.display_surface)
+
+        spider_sprites.update(self.player.rect.center)
+        player_sprite.update()
+        bullet_sprites.update()
+
+        self.player.display_hud()
+
+        pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
+
+        if pygame.sprite.groupcollide(player_sprite, spider_sprites, False, False):
+            try:
+                self.player.hearts.pop()
+            except IndexError:
+                self.state = GameState.OVER
+
+    def do_game_over(self) -> None:
+
+        self.display_surface.fill((0, 0, 0))
+
+    def do_menu(self) -> None:
+
+        self.display_menu()
+
+        if self.keys[pygame.K_SPACE]:
+            self.state = GameState.ACTIVE
+
     def handle_events(self) -> None:
 
-        event: pygame.event.Event = pygame.event.poll()
+        events: list = [event.type for event in pygame.event.get()]
 
-        if event.type == pygame.QUIT:
+        if pygame.QUIT in events:
             pygame.quit()
             sys.exit()
 
-        if event.type == self.event_spider_spawn and self.state == GameState.ACTIVE:
+        if self.event_spider_spawn in events and self.state == GameState.ACTIVE:
             spider_sprites.add(Spider())
 
     @property
@@ -76,42 +117,7 @@ class Game:
         while True:
 
             self.handle_events()
-
-            if self.state == GameState.OVER:  # Game Over.
-
-                self.display_surface.fill("black")
-
-            elif self.state == GameState.MENU:  # Menu.
-
-                self.display_menu()
-
-                if self.keys[pygame.K_SPACE]:
-                    self.state = GameState.ACTIVE
-
-            else:  # Game.
-
-                self.display_surface.fill("black")
-
-                spider_sprites.draw(self.display_surface)
-                spider_sprites.update(self.player.rect.center)
-
-                self.player.display_hud()
-                player_sprite.draw(self.display_surface)
-                player_sprite.update()
-
-                if self.keys[pygame.K_SPACE]:
-                    bullet_sprites.add(Bullet(self.player.rect.center))
-
-                bullet_sprites.draw(self.display_surface)
-                bullet_sprites.update()
-
-                pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
-
-                if pygame.sprite.groupcollide(player_sprite, spider_sprites, False, False):
-                    try:
-                        self.player.hearts.pop()
-                    except IndexError:
-                        self.state = GameState.OVER
+            self.game_state_action[self.state]()
 
             pygame.display.update()
             self.clock.tick(60)
