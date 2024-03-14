@@ -9,6 +9,9 @@ bullet_sprites = pygame.sprite.Group()
 
 
 class Bullet(pygame.sprite.Sprite):
+    """
+    Represents a bullet fired by the player.
+    """
 
     def __init__(self, player_pos: tuple):
         super().__init__()
