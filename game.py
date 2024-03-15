@@ -79,11 +79,7 @@ class Game:
 
         pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
 
-        if pygame.sprite.groupcollide(player_sprite, spider_sprites, False, False):
-            try:
-                self.player.hearts.pop()
-            except IndexError:
-                self.state = GameState.OVER
+        self.state = GameState.OVER if not self.player.hearts else self.state
 
     def do_game_over(self) -> None:
 
