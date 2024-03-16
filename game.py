@@ -7,7 +7,7 @@ import pygame
 
 from modules.menu import GameMenu
 from modules.player import Player, player_sprite
-from modules.spiders import Spider, spider_sprites
+from modules.spiders import AdultSpider, spider_sprites
 from modules.weapons import Bullet, bullet_sprites
 from modules.toolkit import GameState
 
@@ -101,7 +101,7 @@ class Game:
             sys.exit()
 
         if self.event_spider_spawn in events and self.state == GameState.ACTIVE:
-            spider_sprites.add(Spider())
+            spider_sprites.add(AdultSpider())
 
     @property
     def keys(self):
