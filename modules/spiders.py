@@ -54,7 +54,7 @@ class AdultSpider(Spider):
 
     def spawn_babies(self):
 
-        for i in range(randint(a=1, b=5)):
+        for _ in range(randint(a=1, b=5)):
             spider_sprites.add(BabySpider(self.rect.center))  # type: ignore
 
 
