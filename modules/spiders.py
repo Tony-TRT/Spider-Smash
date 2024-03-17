@@ -1,3 +1,8 @@
+"""
+This module contains everything related to spiders.
+"""
+
+
 import pygame
 from random import randint, choice
 from pathlib import Path
@@ -10,6 +15,11 @@ spider_sprites = pygame.sprite.Group()
 
 
 def randomize_spawn_location() -> tuple[int, int]:
+    """Generate a random spawn location for a spider.
+
+    Returns:
+        tuple[int, int]: A tuple containing the randomly generated x and y coordinates.
+    """
 
     random_x_spawn: tuple[int, int] = (randint(-100, -32), randint(932, 1000))
     random_y_spawn: tuple[int, int] = (randint(-100, -32), randint(482, 550))
@@ -46,10 +56,10 @@ class AdultSpider(Spider):
         self.rect = pygame.rect.Rect(*self.spawn_position, 32, 32)
 
     def kill(self):
-        
-        if not choice(range(8)):
+
+        if not randint(a=0, b=7):  # 1 in 8 chance to lay eggs.
             self.spawn_babies()
-        
+
         super().kill()
 
     def spawn_babies(self):
