@@ -33,8 +33,9 @@ class Player(pygame.sprite.Sprite):
 
     def display_hud(self):
 
-        self.stamina_rect = pygame.rect.Rect(680, 20, self.stamina * 2, 20)
-        pygame.draw.rect(self.display_surface, (0, 0, 255), self.stamina_rect)
+        self.stamina_rect = pygame.rect.Rect(670, 20, self.stamina * 2, 18)
+        pygame.draw.rect(self.display_surface, (102, 255, 51), self.stamina_rect)
+        self.display_surface.blit(self.hud_assets.get("stamina"), (660, 20))
 
         for heart in self.hearts:
             self.display_surface.blit(self.hud_assets.get("heart"), heart)
