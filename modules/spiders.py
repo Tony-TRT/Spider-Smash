@@ -4,7 +4,7 @@ This module contains everything related to spiders.
 
 
 import pygame
-from random import randint, choice
+from random import randint
 from pathlib import Path
 
 from modules import constants
