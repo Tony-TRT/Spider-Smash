@@ -47,3 +47,6 @@ class Bullet(pygame.sprite.Sprite):
 
         pos_x, pos_y = self.bullet_repr[:2]
         self.rect.center = (int(pos_x), int(pos_y))
+
+        if not (-5 <= self.rect.centerx <= 905) or not (-5 <= self.rect.centery <= 455):
+            self.kill()

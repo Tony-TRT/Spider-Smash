@@ -4,12 +4,14 @@ This module serves as the core module of the game, containing essential elements
 
 import sys
 import pygame
+from pathlib import Path
 
+from modules import constants
 from modules.menu import GameMenu
 from modules.player import Player, player_sprite
 from modules.spiders import AdultSpider, spider_sprites
 from modules.weapons import Bullet, bullet_sprites
-from modules.toolkit import GameState
+from modules.toolkit import GameState, load_images
 
 
 class Game:
@@ -31,6 +33,7 @@ class Game:
         # Useful variables.
         ##############################
 
+        self.assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "general"))
         self.state = GameState.MENU
         self.game_state_action: dict = {
             GameState.ACTIVE: self.do_game,
@@ -62,7 +65,7 @@ class Game:
 
     def do_game(self) -> None:
 
-        self.display_surface.fill((0, 0, 0))
+        self.display_surface.blit(self.assets.get("ground"), (0, 0))
 
         if self.keys[pygame.K_SPACE]:
             bullet_sprites.add(Bullet(self.player.rect.center))

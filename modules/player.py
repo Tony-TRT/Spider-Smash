@@ -18,25 +18,27 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
+        self.player_assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "player"), alpha=True)
+        self.hud_assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "hud"), alpha=True)
         self.display_surface = pygame.display.get_surface()
         self.velocity: int = 3
         self.stamina: float = 100
         self.stamina_rect = None
-        self.hearts: list = [pygame.rect.Rect(20 + (i * 40), 20, 20, 20) for i in range(5)]
+        self.hearts: list = [pygame.rect.Rect(20 + (i * 50), 20, 20, 20) for i in range(5)]
         self.invulnerability_time: int = 0
         self.invulnerable: bool = False
         self.dead_zone: int = 10
-        self.images: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "player"), alpha=True)
-        self.image = self.images.get("sample")
+        self.image = self.player_assets.get("sample")
         self.rect = pygame.rect.Rect(434, 209, 32, 32)
 
     def display_hud(self):
 
-        self.stamina_rect = pygame.rect.Rect(680, 20, self.stamina * 2, 20)
-        pygame.draw.rect(self.display_surface, (0, 0, 255), self.stamina_rect)
+        self.stamina_rect = pygame.rect.Rect(670, 20, self.stamina * 2, 18)
+        pygame.draw.rect(self.display_surface, (102, 255, 51), self.stamina_rect)
+        self.display_surface.blit(self.hud_assets.get("stamina"), (660, 20))
 
         for heart in self.hearts:
-            pygame.draw.rect(self.display_surface, (255, 0, 0), heart)
+            self.display_surface.blit(self.hud_assets.get("heart"), heart)
 
     def minus_one_heart(self) -> None:
 

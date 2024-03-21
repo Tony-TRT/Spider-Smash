@@ -2,9 +2,8 @@
 This module contains everything related to spiders.
 """
 
-
 import pygame
-from random import randint, choice
+from random import randint
 from pathlib import Path
 
 from modules import constants
@@ -21,9 +20,12 @@ def randomize_spawn_location() -> tuple[int, int]:
         tuple[int, int]: A tuple containing the randomly generated x and y coordinates.
     """
 
-    random_x_spawn: tuple[int, int] = (randint(-100, -32), randint(932, 1000))
-    random_y_spawn: tuple[int, int] = (randint(-100, -32), randint(482, 550))
-    return choice(random_x_spawn), choice(random_y_spawn)
+    random_x_spawn: int = randint(-100, 1000)
+    random_y_spawn: int = randint(-100, 550)
+
+    if not (-32 <= random_x_spawn <= 982) or not (-32 <= random_y_spawn <= 582):
+        return random_x_spawn, random_y_spawn
+    return randomize_spawn_location()
 
 
 class Spider(pygame.sprite.Sprite):
