@@ -57,6 +57,68 @@ class GameState(Enum):
     OVER = auto()
 
 
+class Direction(Enum):
+    """
+    Enum class representing cardinal and ordinal directions.
+    """
+
+    NORTHWEST = 45
+    NORTH = 0
+    NORTHEAST = 315
+    EAST = 270
+    SOUTHEAST = 225
+    SOUTH = 180
+    SOUTHWEST = 135
+    WEST = 90
+    NONE = 0
+
+
+def get_direction(dx, dy, margin: int = 60) -> Direction:
+    """Determine the direction of movement based on horizontal and vertical components.
+
+    Args:
+        dx (int): The horizontal component of the movement.
+        dy (int): The vertical component of the movement.
+        margin (int, optional): The margin of error to consider for horizontal and vertical movements.
+
+    Returns:
+        Direction: The direction of movement as an instance of Direction enum.
+    """
+
+    # Check if the absolute value of dy is less than the margin.
+    # If dy is within the margin, it indicates horizontal movement.
+    if abs(dy) < margin:
+
+        # Check the sign of dx to determine the direction
+        if dx < 0:
+            return Direction.WEST
+        elif dx > 0:
+            return Direction.EAST
+
+    # If dy is not within the margin, check if dx is within the margin.
+    # If dx is within the margin, it indicates vertical movement.
+    elif abs(dx) < margin:
+
+        # Check the sign of dy to determine the direction.
+        if dy < 0:
+            return Direction.NORTH
+        elif dy > 0:
+            return Direction.SOUTH
+
+    # If neither dx nor dy are within the margin, consider diagonal movement.
+    else:
+        # Check the signs of dx and dy to determine the diagonal direction.
+        if dy < 0:
+            # If dy is negative, the movement is towards the top.
+            return Direction.NORTHWEST if dx < 0 else Direction.NORTHEAST
+        elif dy > 0:
+            # If dy is positive, the movement is towards the bottom.
+            return Direction.SOUTHWEST if dx < 0 else Direction.SOUTHEAST
+
+    # If none of the above conditions are met.
+    return Direction.NONE
+
+
 def load_images(folder: Path, alpha: bool = False) -> dict:
     """Load images from a specified folder.
 

@@ -7,7 +7,7 @@ from random import randint
 from pathlib import Path
 
 from modules import constants
-from modules.toolkit import SpritesLoader, calculate_movement, load_images
+from modules import toolkit
 
 
 spider_sprites = pygame.sprite.Group()
@@ -35,14 +35,14 @@ class Spider(pygame.sprite.Sprite):
 
         self.velocity = None
         self.spawn_position = None
-        self.assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "spiders"), alpha=True)
+        self.assets: dict = toolkit.load_images(folder=Path(constants.GRAPHICS_DIR / "spiders"), alpha=True)
 
         self.image = None
         self.rect = None
 
     def update(self, player_position: tuple[int, int]):
 
-        mov_x, mov_y = calculate_movement(player_position, self.rect, 15, self.velocity)
+        mov_x, mov_y = toolkit.calculate_movement(player_position, self.rect, 15, self.velocity)
         self.rect.move_ip(mov_x, mov_y)
 
 
@@ -53,7 +53,7 @@ class AdultSpider(Spider):
 
         self.velocity: int = 2
         self.spawn_position: tuple[int, int] = randomize_spawn_location()
-        self.idle_animation_sprites: list[pygame.Surface] = SpritesLoader(
+        self.idle_animation_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
             sprites_image=self.assets.get("idle_green_spiders"),
             sprites_size=64,
             sprites_number=7
@@ -79,13 +79,18 @@ class AdultSpider(Spider):
     def update(self, player_position: tuple[int, int]):
 
         super().update(player_position)
+
+        dx: int = int(player_position[0] - self.rect.centerx)
+        dy: int = int(player_position[1] - self.rect.centery)
+        direction: toolkit.Direction = toolkit.get_direction(dx=dx, dy=dy)
         self.animation_frame_delay -= 1
 
         if self.animation_frame_delay <= 0:
 
             self.animation_frame_delay = 5
             self.current_frame_index = (self.current_frame_index + 1) % len(self.idle_animation_sprites)
-            self.image = self.idle_animation_sprites[self.current_frame_index]
+            image = pygame.transform.rotate(self.idle_animation_sprites[self.current_frame_index], direction.value)
+            self.image = image
 
 
 class BabySpider(Spider):
