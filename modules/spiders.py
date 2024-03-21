@@ -7,7 +7,7 @@ from random import randint
 from pathlib import Path
 
 from modules import constants
-from modules.toolkit import calculate_movement, load_images
+from modules.toolkit import SpritesLoader, calculate_movement, load_images
 
 
 spider_sprites = pygame.sprite.Group()
@@ -53,8 +53,15 @@ class AdultSpider(Spider):
 
         self.velocity: int = 2
         self.spawn_position: tuple[int, int] = randomize_spawn_location()
+        self.idle_animation_sprites: list[pygame.Surface] = SpritesLoader(
+            sprites_image=self.assets.get("idle_green_spiders"),
+            sprites_size=64,
+            sprites_number=7
+        ).sprite_surfaces()
+        self.current_frame_index: int = 0
+        self.animation_frame_delay: int = 5
 
-        self.image = self.assets.get("sample")
+        self.image = self.idle_animation_sprites[self.current_frame_index]
         self.rect = pygame.rect.Rect(*self.spawn_position, 32, 32)
 
     def kill(self):
@@ -68,6 +75,17 @@ class AdultSpider(Spider):
 
         for _ in range(randint(a=1, b=5)):
             spider_sprites.add(BabySpider(self.rect.center))  # type: ignore
+
+    def update(self, player_position: tuple[int, int]):
+
+        super().update(player_position)
+        self.animation_frame_delay -= 1
+
+        if self.animation_frame_delay <= 0:
+
+            self.animation_frame_delay = 5
+            self.current_frame_index = (self.current_frame_index + 1) % len(self.idle_animation_sprites)
+            self.image = self.idle_animation_sprites[self.current_frame_index]
 
 
 class BabySpider(Spider):
