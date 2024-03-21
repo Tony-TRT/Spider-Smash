@@ -9,6 +9,46 @@ from math import sqrt
 from enum import Enum, auto
 
 
+class SpritesLoader:
+
+    def __init__(self, sprites_image: pygame.Surface, sprites_size: int, sprites_number: int):
+
+        self.main_image = sprites_image
+        self.sprites_size: int = sprites_size
+        self.sprites_number: int = sprites_number
+
+    def _get_sprite(self, frame_index: int, scale_factor: float = None) -> pygame.Surface:
+        """Generates a surface for a specific sprite frame.
+
+        Args:
+            frame_index (int): The index of the sprite frame to retrieve.
+            scale_factor (float, optional): The factor by which to scale the sprite surface.
+
+        Returns:
+            pygame.Surface: The surface containing the specified sprite frame.
+        """
+
+        surface = pygame.Surface((self.sprites_size, self.sprites_size)).convert_alpha()
+        source_area = (frame_index * self.sprites_size, 0, self.sprites_size, self.sprites_size)
+        surface.blit(source=self.main_image, dest=(0, 0), area=source_area)
+
+        if scale_factor:
+            size = (self.sprites_size * scale_factor, self.sprites_size * scale_factor)
+            surface = pygame.transform.scale(surface=surface, size=size)
+
+        return surface
+
+    @property
+    def sprite_surfaces(self) -> list[pygame.Surface]:
+        """Generates surfaces for all sprite frames.
+
+        Returns:
+            list[pygame.Surface]: A list containing surfaces for all sprite frames.
+        """
+
+        return [self._get_sprite(i) for i in range(self.sprites_number)]
+
+
 class GameState(Enum):
     """
     Enumeration representing different states of the game.
