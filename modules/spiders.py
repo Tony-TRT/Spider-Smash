@@ -2,7 +2,6 @@
 This module contains everything related to spiders.
 """
 
-
 import pygame
 from random import randint
 from pathlib import Path
