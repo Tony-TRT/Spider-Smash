@@ -28,10 +28,9 @@ class SpritesLoader:
             pygame.Surface: The surface containing the specified sprite frame.
         """
 
-        surface = pygame.Surface((self.sprites_size, self.sprites_size)).convert_alpha()
+        surface = pygame.Surface((self.sprites_size, self.sprites_size), pygame.SRCALPHA)
         source_area = (frame_index * self.sprites_size, 0, self.sprites_size, self.sprites_size)
         surface.blit(source=self.main_image, dest=(0, 0), area=source_area)
-        surface.set_colorkey((0, 0, 0))
         size = (self.sprites_size * scale_factor, self.sprites_size * scale_factor)
         return pygame.transform.scale(surface=surface, size=size)
 
