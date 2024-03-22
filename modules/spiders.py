@@ -59,7 +59,7 @@ class AdultSpider(Spider):
             sprites_number=7
         ).sprite_surfaces()
         self.current_frame_index: int = 0
-        self.animation_frame_delay: int = 5
+        self.animation_frame_delay: int = 6
 
         self.image = self.idle_animation_sprites[self.current_frame_index]
         self.rect = pygame.rect.Rect(*self.spawn_position, 32, 32)
@@ -87,10 +87,12 @@ class AdultSpider(Spider):
 
         if self.animation_frame_delay <= 0:
 
-            self.animation_frame_delay = 5
+            self.animation_frame_delay = 6
             self.current_frame_index = (self.current_frame_index + 1) % len(self.idle_animation_sprites)
             image = pygame.transform.rotate(self.idle_animation_sprites[self.current_frame_index], direction.value)
             self.image = image
+            # It's important to recenter the rectangle because rotation alters the image's dimensions.
+            self.rect = self.image.get_rect(center=self.rect.center)
 
 
 class BabySpider(Spider):
