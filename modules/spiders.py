@@ -13,37 +13,95 @@ from modules import toolkit
 spider_sprites = pygame.sprite.Group()
 
 
-def randomize_spawn_location() -> tuple[int, int]:
-    """Generate a random spawn location for a spider.
-
-    Returns:
-        tuple[int, int]: A tuple containing the randomly generated x and y coordinates.
-    """
-
-    random_x_spawn: int = randint(-100, 1000)
-    random_y_spawn: int = randint(-100, 550)
-
-    if not (-32 <= random_x_spawn <= 982) or not (-32 <= random_y_spawn <= 582):
-        return random_x_spawn, random_y_spawn
-    return randomize_spawn_location()
-
-
 class Spider(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__()
 
-        self.velocity = None
-        self.spawn_position = None
+        self.velocity: int = 0
+        self.spawn_position: tuple[int, int]
+        self.direction: toolkit.Direction = toolkit.Direction.NONE
+        self.attacking: bool = False
+        self.idle_frame_index: int = 0
+        self.attacking_frame_index: int = 0
+        self.animation_frame_delay: int = 0
+
+        ##############################
+        # Assets.
+        ##############################
+
         self.assets: dict = toolkit.load_images(folder=Path(constants.GRAPHICS_DIR / "spiders"), alpha=True)
 
-        self.image = None
-        self.rect = None
+        self.adult_idle_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("idle_green_spiders"),
+            sprites_size=64,
+            sprites_number=7
+        ).sprite_surfaces()
 
-    def update(self, player_position: tuple[int, int]):
+        self.baby_idle_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("idle_red_spiders"),
+            sprites_size=64,
+            sprites_number=7
+        ).sprite_surfaces(0.7)
+
+        self.adult_attacking_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("attack_green_spiders"),
+            sprites_size=64,
+            sprites_number=3
+        ).sprite_surfaces()
+
+        self.baby_attacking_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("attack_red_spiders"),
+            sprites_size=64,
+            sprites_number=3
+        ).sprite_surfaces(0.7)
+
+        ##############################
+
+        self.image: pygame.Surface
+        self.rect: pygame.Rect
+
+    def attack_animation(self) -> None:
+
+        ...
+
+    def get_direction(self, player_position: tuple[int, int]) -> toolkit.Direction:
+        """Determines the direction in which a spider moves.
+
+        Args:
+            player_position (tuple[int, int]): The position of the player as a tuple of (x, y) coordinates.
+
+        Returns:
+            toolkit.Direction: The direction as an instance of toolkit.Direction enum.
+        """
+
+        dx: int = int(player_position[0] - self.rect.centerx)
+        dy: int = int(player_position[1] - self.rect.centery)
+        return toolkit.get_direction(dx=dx, dy=dy)
+
+    def idle_animation(self) -> None:
+
+        ...
+
+    def update(self, player_position: tuple[int, int]) -> None:
 
         mov_x, mov_y = toolkit.calculate_movement(player_position, self.rect, 15, self.velocity)
         self.rect.move_ip(mov_x, mov_y)
+
+        self.animation_frame_delay -= 1
+        self.attacking = True if (mov_x, mov_y) == (0, 0) else False
+        self.direction = self.get_direction(player_position=player_position)
+
+        if self.animation_frame_delay <= 0 and not self.attacking:
+
+            self.idle_animation()
+
+        elif self.animation_frame_delay <= 0 and self.attacking:
+
+            self.attack_animation()
+
+        # It's important to recenter the rectangle because rotation alters the image's dimensions.
+        self.rect = self.image.get_rect(center=self.rect.center)
 
 
 class AdultSpider(Spider):
@@ -51,48 +109,53 @@ class AdultSpider(Spider):
     def __init__(self):
         super().__init__()
 
-        self.velocity: int = 2
-        self.spawn_position: tuple[int, int] = randomize_spawn_location()
-        self.idle_animation_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("idle_green_spiders"),
-            sprites_size=64,
-            sprites_number=7
-        ).sprite_surfaces()
-        self.current_frame_index: int = 0
-        self.animation_frame_delay: int = 6
+        self.velocity = 2
+        self.spawn_position = self.randomize_spawn_location()
 
-        self.image = self.idle_animation_sprites[self.current_frame_index]
+        self.image = self.adult_idle_sprites[self.idle_frame_index]
         self.rect = pygame.rect.Rect(*self.spawn_position, 32, 32)
 
-    def kill(self):
+    def attack_animation(self) -> None:
+
+        self.animation_frame_delay = 12
+        self.attacking_frame_index = (self.attacking_frame_index + 1) % len(self.adult_attacking_sprites)
+
+        image = pygame.transform.rotate(self.adult_attacking_sprites[self.attacking_frame_index], self.direction.value)
+        self.image = image
+
+    def idle_animation(self) -> None:
+
+        self.animation_frame_delay = 6
+        self.idle_frame_index = (self.idle_frame_index + 1) % len(self.adult_idle_sprites)
+
+        image = pygame.transform.rotate(self.adult_idle_sprites[self.idle_frame_index], self.direction.value)
+        self.image = image
+
+    def kill(self) -> None:
 
         if not randint(a=0, b=7):  # 1 in 8 chance to lay eggs.
             self.spawn_babies()
 
         super().kill()
 
-    def spawn_babies(self):
+    def randomize_spawn_location(self) -> tuple[int, int]:
+        """Generate a random spawn location for a spider.
 
-        for _ in range(randint(a=1, b=5)):
-            spider_sprites.add(BabySpider(self.rect.center))  # type: ignore
+        Returns:
+            tuple[int, int]: A tuple containing the randomly generated x and y coordinates.
+        """
 
-    def update(self, player_position: tuple[int, int]):
+        random_x_spawn: int = randint(-100, 1000)
+        random_y_spawn: int = randint(-100, 550)
 
-        super().update(player_position)
+        if not (-32 <= random_x_spawn <= 982) or not (-32 <= random_y_spawn <= 582):
+            return random_x_spawn, random_y_spawn
+        return self.randomize_spawn_location()
 
-        dx: int = int(player_position[0] - self.rect.centerx)
-        dy: int = int(player_position[1] - self.rect.centery)
-        direction: toolkit.Direction = toolkit.get_direction(dx=dx, dy=dy)
-        self.animation_frame_delay -= 1
+    def spawn_babies(self) -> None:
 
-        if self.animation_frame_delay <= 0:
-
-            self.animation_frame_delay = 6
-            self.current_frame_index = (self.current_frame_index + 1) % len(self.idle_animation_sprites)
-            image = pygame.transform.rotate(self.idle_animation_sprites[self.current_frame_index], direction.value)
-            self.image = image
-            # It's important to recenter the rectangle because rotation alters the image's dimensions.
-            self.rect = self.image.get_rect(center=self.rect.center)
+        for i in range(randint(a=1, b=5)):
+            spider_sprites.add(BabySpider((self.rect.centerx - 20 * i, self.rect.centery - 20 * i)))  # type: ignore
 
 
 class BabySpider(Spider):
@@ -100,8 +163,24 @@ class BabySpider(Spider):
     def __init__(self, spawn_position: tuple[int, int]):
         super().__init__()
 
-        self.velocity: int = 3
-        self.spawn_position: tuple[int, int] = spawn_position
+        self.velocity = 3
+        self.spawn_position = spawn_position
 
-        self.image = self.assets.get("b_sample")
+        self.image = self.baby_idle_sprites[self.idle_frame_index]
         self.rect = pygame.rect.Rect(*self.spawn_position, 24, 24)
+
+    def attack_animation(self) -> None:
+
+        self.animation_frame_delay = 6
+        self.attacking_frame_index = (self.attacking_frame_index + 1) % len(self.baby_attacking_sprites)
+
+        image = pygame.transform.rotate(self.baby_attacking_sprites[self.attacking_frame_index], self.direction.value)
+        self.image = image
+
+    def idle_animation(self) -> None:
+
+        self.animation_frame_delay = 3
+        self.idle_frame_index = (self.idle_frame_index + 1) % len(self.baby_idle_sprites)
+
+        image = pygame.transform.rotate(self.baby_idle_sprites[self.idle_frame_index], self.direction.value)
+        self.image = image
