@@ -8,6 +8,7 @@ from pathlib import Path
 
 from modules import constants
 from modules.menu import GameMenu
+from modules.hud import Hud
 from modules.player import Player, player_sprite
 from modules.spiders import AdultSpider, spider_sprites
 from modules.weapons import Bullet, bullet_sprites
@@ -47,6 +48,7 @@ class Game:
 
         self.player = Player()
         self.menu = GameMenu()
+        self.hud = Hud()
 
         player_sprite.add(self.player)
 
@@ -78,7 +80,7 @@ class Game:
         player_sprite.update()
         bullet_sprites.update()
 
-        self.player.display_hud()
+        self.hud.update(self.player.hearts, self.player.stamina)
 
         pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
 
