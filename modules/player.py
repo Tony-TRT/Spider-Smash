@@ -6,6 +6,7 @@ import pygame
 from pathlib import Path
 
 from modules import constants
+from modules import toolkit
 from modules.spiders import spider_sprites
 from modules.toolkit import load_images, calculate_movement
 
@@ -18,7 +19,38 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
+        ##############################
+        # Assets.
+        ##############################
+
         self.assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "player"), alpha=True)
+
+        self.idle_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("hero_idle"),
+            sprites_size=16,
+            sprites_number=3
+        ).sprite_surfaces(2)
+
+        self.walk_down_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("hero_walk_down"),
+            sprites_size=16,
+            sprites_number=4
+        ).sprite_surfaces(2)
+
+        self.walk_up_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("hero_walk_up"),
+            sprites_size=16,
+            sprites_number=4
+        ).sprite_surfaces(2)
+
+        self.walk_side_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("hero_walk_side"),
+            sprites_size=16,
+            sprites_number=4
+        ).sprite_surfaces(2)
+
+        ##############################
+
         self.game_surface = pygame.display.get_surface()
         self.velocity: int = 3
         self.stamina: int = 100
@@ -26,7 +58,10 @@ class Player(pygame.sprite.Sprite):
         self.invulnerability_time: int = 0
         self.invulnerable: bool = False
         self.dead_zone: int = 10
-        self.image = self.assets.get("sample")
+        self.animation_frame_delay: int = 0
+        self.frame_index: int = 0
+
+        self.image = self.idle_sprites[self.frame_index]
         self.rect = pygame.rect.Rect(434, 209, 32, 32)
 
     def minus_one_heart(self) -> None:
