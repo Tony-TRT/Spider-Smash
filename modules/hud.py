@@ -65,7 +65,7 @@ class Hud:
         self.animation_frame_delay -= 1
 
         # Display the stamina bar.
-        pygame.draw.rect(self.hud_surface, (51, 204, 255), self.stamina_rectangle)
+        pygame.draw.rect(self.hud_surface, (255, 10, 10), self.stamina_rectangle)
         self.hud_surface.blit(self.assets.get("stamina"), (660, 20))
 
         # Display and update the hearts.
