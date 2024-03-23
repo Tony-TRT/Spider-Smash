@@ -83,6 +83,11 @@ class Spider(pygame.sprite.Sprite):
 
         ...
 
+    def kill(self):
+
+        spider_sprites.add(SpiderBloodSplash(position=self.rect.center))  # type: ignore
+        super().kill()
+
     def update(self, player_position: tuple[int, int]) -> None:
 
         mov_x, mov_y = toolkit.calculate_movement(player_position, self.rect, 15, self.velocity)
@@ -184,3 +189,60 @@ class BabySpider(Spider):
 
         image = pygame.transform.rotate(self.baby_idle_sprites[self.idle_frame_index], self.direction.value)
         self.image = image
+
+
+class SpiderBloodSplash(pygame.sprite.Sprite):
+    """
+    This class manages the animation of a blood splash when a spider is destroyed.
+    The animation consists of a series of images representing a blood splash,
+    which are displayed successively to create a visual effect of damage or destruction.
+    """
+
+    def __init__(self, position: tuple[int, int]):
+        super().__init__()
+
+        assets: dict = toolkit.load_images(
+            folder=Path(constants.GRAPHICS_DIR / "spiders", "blood"),
+            alpha=True
+        )
+
+        self.animation_frames: list[pygame.Surface] = list(assets.values())
+        self.animation_frame_index: int = 0
+        self.animation_frame_delay: int = 0
+
+        self.image = self.animation_frames[self.animation_frame_index]
+        self.rect = pygame.Rect(*self.adjust_position(position), 32, 32)
+
+    @staticmethod
+    def adjust_position(position: tuple[int, int]) -> tuple[int, int]:
+        """Adjusts the given position by offsetting both coordinate.
+
+        Args:
+            position (tuple[int, int]): A tuple containing the x and y coordinates of the position.
+
+        Returns:
+            tuple[int, int]: The adjusted position with both coordinates offset.
+        """
+
+        return position[0] - 90, position[1] - 90
+
+    def play_animation(self) -> None:
+
+        self.animation_frame_delay = 1
+        self.animation_frame_index = (self.animation_frame_index + 1) % len(self.animation_frames)
+
+        frame = self.animation_frames[self.animation_frame_index]
+        scaled_frame = pygame.transform.scale2x(frame)
+
+        self.image = scaled_frame
+
+        if self.animation_frame_index >= 28:
+            self.kill()
+
+    def update(self, *args, **kwargs) -> None:
+
+        self.animation_frame_delay -= 1
+
+        if self.animation_frame_delay <= 0:
+
+            self.play_animation()
