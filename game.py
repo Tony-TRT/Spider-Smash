@@ -58,7 +58,7 @@ class Game:
 
         self.event_spider_spawn = pygame.USEREVENT + 1
 
-        pygame.time.set_timer(self.event_spider_spawn, 500)
+        pygame.time.set_timer(self.event_spider_spawn, 400)
 
     def display_menu(self) -> None:
 

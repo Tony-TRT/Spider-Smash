@@ -141,7 +141,7 @@ class AdultSpider(Spider):
 
     def kill(self) -> None:
 
-        if not randint(a=0, b=7):  # 1 in 8 chance to lay eggs.
+        if not randint(a=0, b=2):  # 1 in 3 chance to lay eggs.
             self.spawn_babies()
 
         super().kill()
