@@ -19,6 +19,8 @@ class Spider(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
+        self.game_surface: pygame.Surface = pygame.display.get_surface()
+
         self.velocity: int = 0
         self.spawn_position: tuple[int, int]
         self.direction: toolkit.Direction = toolkit.Direction.NONE
@@ -65,6 +67,15 @@ class Spider(pygame.sprite.Sprite):
     def attack_animation(self) -> None:
 
         ...
+
+    def draw_shadow(self) -> None:
+
+        spider_shadow: pygame.Surface = self.image.copy()
+        black_surface: pygame.Surface = pygame.Surface(spider_shadow.get_size(), pygame.SRCALPHA)
+        black_surface.fill((0, 0, 0, 150))
+
+        spider_shadow.blit(black_surface, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        self.game_surface.blit(spider_shadow, (self.rect.x - 4, self.rect.y + 4))
 
     def get_direction(self, player_position: tuple[int, int]) -> toolkit.Direction:
         """Determines the direction in which a spider moves.

@@ -73,6 +73,11 @@ class Game:
             bullet_sprites.add(Bullet((int(self.player.rect.centerx), int(self.player.rect.centery))))
 
         spider_blood_effects.draw(self.display_surface)
+
+        for spider in spider_sprites:
+
+            spider.draw_shadow()
+
         spider_sprites.draw(self.display_surface)
         player_sprite.draw(self.display_surface)
         bullet_sprites.draw(self.display_surface)

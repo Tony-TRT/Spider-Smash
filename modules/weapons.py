@@ -74,9 +74,9 @@ class Bullet(pygame.sprite.Sprite):
         self.light_surface.fill((0, 0, 0, 0))
         pygame.draw.circle(
             surface=self.light_surface,
-            color=(255, 153, 0, 7),
+            color=(255, 153, 0, 5),
             center=self.rect.center,
-            radius=randint(a=35, b=50),
+            radius=randint(a=70, b=120),
             width=0
         )
 
