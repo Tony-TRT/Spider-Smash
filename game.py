@@ -10,7 +10,7 @@ from modules import constants
 from modules.menu import GameMenu
 from modules.hud import Hud
 from modules.player import Player, player_sprite
-from modules.spiders import AdultSpider, spider_sprites
+from modules.spiders import AdultSpider, spider_sprites, spider_blood_effects
 from modules.weapons import Bullet, bullet_sprites
 from modules.toolkit import GameState, load_images
 
@@ -72,10 +72,12 @@ class Game:
         if self.keys[pygame.K_SPACE]:
             bullet_sprites.add(Bullet(self.player.rect.center))
 
+        spider_blood_effects.draw(self.display_surface)
         spider_sprites.draw(self.display_surface)
         player_sprite.draw(self.display_surface)
         bullet_sprites.draw(self.display_surface)
 
+        spider_blood_effects.update()
         spider_sprites.update(self.player.rect.center)
         player_sprite.update()
         bullet_sprites.update()

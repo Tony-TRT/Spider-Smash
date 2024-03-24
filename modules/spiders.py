@@ -3,7 +3,7 @@ This module contains everything related to spiders.
 """
 
 import pygame
-from random import randint
+from random import randint, uniform, choice
 from pathlib import Path
 
 from modules import constants
@@ -11,6 +11,7 @@ from modules import toolkit
 
 
 spider_sprites = pygame.sprite.Group()
+spider_blood_effects = pygame.sprite.Group()
 
 
 class Spider(pygame.sprite.Sprite):
@@ -85,7 +86,9 @@ class Spider(pygame.sprite.Sprite):
 
     def kill(self):
 
-        spider_sprites.add(SpiderBloodSplash(position=self.rect.center))  # type: ignore
+        spider_blood_effects.add(SpiderBloodSplat(position=self.rect.center))   # type: ignore
+        spider_blood_effects.add(SpiderBloodSplash(position=self.rect.center))  # type: ignore
+
         super().kill()
 
     def update(self, player_position: tuple[int, int]) -> None:
@@ -201,6 +204,8 @@ class SpiderBloodSplash(pygame.sprite.Sprite):
     def __init__(self, position: tuple[int, int]):
         super().__init__()
 
+        adjusted_position: tuple[int, int] = position[0] - 90, position[1] - 90
+
         assets: dict = toolkit.load_images(
             folder=Path(constants.GRAPHICS_DIR / "spiders", "blood"),
             alpha=True
@@ -211,20 +216,7 @@ class SpiderBloodSplash(pygame.sprite.Sprite):
         self.animation_frame_delay: int = 0
 
         self.image = self.animation_frames[self.animation_frame_index]
-        self.rect = pygame.Rect(*self.adjust_position(position), 32, 32)
-
-    @staticmethod
-    def adjust_position(position: tuple[int, int]) -> tuple[int, int]:
-        """Adjusts the given position by offsetting both coordinate.
-
-        Args:
-            position (tuple[int, int]): A tuple containing the x and y coordinates of the position.
-
-        Returns:
-            tuple[int, int]: The adjusted position with both coordinates offset.
-        """
-
-        return position[0] - 90, position[1] - 90
+        self.rect = pygame.Rect(*adjusted_position, 32, 32)
 
     def play_animation(self) -> None:
 
@@ -239,10 +231,72 @@ class SpiderBloodSplash(pygame.sprite.Sprite):
         if self.animation_frame_index >= 28:
             self.kill()
 
-    def update(self, *args, **kwargs) -> None:
+    def update(self) -> None:
 
         self.animation_frame_delay -= 1
 
         if self.animation_frame_delay <= 0:
 
             self.play_animation()
+
+
+class SpiderBloodSplat(pygame.sprite.Sprite):
+    """
+    A class representing blood splats left by spiders.
+    """
+
+    def __init__(self, position: tuple[int, int]):
+        super().__init__()
+
+        adjusted_position: tuple[int, int] = position[0] - 30, position[1] - 30
+
+        ##############################
+        # Assets.
+        ##############################
+
+        blood_splats_file: Path = Path(constants.GRAPHICS_DIR / "spiders", "blood_splats.png")
+        blood_splats: pygame.Surface = pygame.image.load(blood_splats_file).convert_alpha()
+
+        self.blood_splats_list: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=blood_splats,
+            sprites_size=256,
+            sprites_number=5
+        ).sprite_surfaces()
+
+        ##############################
+
+        self.opacity: int = 100
+        self.animation_frame_delay: int = 100
+
+        self.image: pygame.Surface = self.randomize_splat()
+        self.rect: pygame.Rect = pygame.Rect(*adjusted_position, 32, 32)
+
+    def randomize_splat(self) -> pygame.Surface:
+        """Randomly selects a blood splat image, rotates and scales it, and returns the modified surface.
+
+        Returns:
+            pygame.Surface: The modified blood splat image.
+        """
+
+        scale_factor: float = uniform(a=0.20, b=0.25)
+        selected_splat: pygame.Surface = choice(self.blood_splats_list)
+        rotated_splat = pygame.transform.rotate(selected_splat, randint(a=1, b=360))
+        scaled_and_rotated_splat = pygame.transform.scale(
+            surface=rotated_splat,
+            size=(rotated_splat.get_width() * scale_factor, rotated_splat.get_height() * scale_factor)
+        )
+
+        return scaled_and_rotated_splat
+
+    def update(self) -> None:
+
+        self.animation_frame_delay -= 1
+
+        if self.animation_frame_delay <= 0:
+
+            self.animation_frame_delay = 5
+            self.opacity -= 1
+            self.image.set_alpha(self.opacity)
+
+        if self.opacity <= 0:
+            self.kill()
