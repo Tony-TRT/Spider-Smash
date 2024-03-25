@@ -7,6 +7,7 @@ from pathlib import Path
 
 from modules import constants
 from modules import toolkit
+from modules.toolkit import Direction as Drc
 from modules.spiders import spider_sprites
 
 
@@ -42,6 +43,10 @@ class Player(pygame.sprite.Sprite):
             sprites_number=8
         ).sprite_surfaces()
 
+        self.right_idle_sprites: list[pygame.Surface] = [
+            pygame.transform.flip(surface, True, False) for surface in self.left_idle_sprites
+        ]
+
         self.front_run_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
             sprites_image=self.assets.get("front_hero_run"),
             sprites_size=64,
@@ -60,6 +65,10 @@ class Player(pygame.sprite.Sprite):
             sprites_number=8
         ).sprite_surfaces()
 
+        self.right_run_sprites: list[pygame.Surface] = [
+            pygame.transform.flip(surface, True, False) for surface in self.left_run_sprites
+        ]
+
         self.front_walk_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
             sprites_image=self.assets.get("front_hero_walk"),
             sprites_size=64,
@@ -77,6 +86,33 @@ class Player(pygame.sprite.Sprite):
             sprites_size=64,
             sprites_number=8
         ).sprite_surfaces()
+
+        self.right_walk_sprites: list[pygame.Surface] = [
+            pygame.transform.flip(surface, True, False) for surface in self.left_walk_sprites
+        ]
+
+        ##############################
+
+        self.idle_direction_dict: dict = {
+            Drc.NORTH: self.back_idle_sprites,
+            Drc.SOUTH: self.front_idle_sprites,
+            Drc.EAST: self.right_idle_sprites,
+            Drc.WEST: self.left_idle_sprites
+        }
+
+        self.walk_direction_dict: dict = {
+            Drc.NORTH: self.back_walk_sprites,
+            Drc.SOUTH: self.front_walk_sprites,
+            Drc.EAST: self.right_walk_sprites,
+            Drc.WEST: self.left_walk_sprites
+        }
+
+        self.run_direction_dict: dict = {
+            Drc.NORTH: self.back_run_sprites,
+            Drc.SOUTH: self.front_run_sprites,
+            Drc.EAST: self.right_run_sprites,
+            Drc.WEST: self.left_run_sprites
+        }
 
         ##############################
 
@@ -101,9 +137,29 @@ class Player(pygame.sprite.Sprite):
         self.image = self.front_idle_sprites[self.idle_frame_index]
         self.rect = pygame.rect.Rect(434, 209, 32, 32)
 
+    @property
+    def direction(self) -> toolkit.Direction:
+
+        mouse_position: tuple[int, int] = pygame.mouse.get_pos()
+        dx: int = int(mouse_position[0] - self.rect.centerx)
+        dy: int = int(mouse_position[1] - self.rect.centery)
+        direction: toolkit.Direction = toolkit.get_direction(dx=dx, dy=dy)
+
+        if direction.value in {315, 270, 225}:
+
+            return Drc.EAST
+
+        elif direction.value in {45, 90, 135}:
+
+            return Drc.WEST
+
+        return direction
+
     def idle_animation(self) -> None:
 
-        ...
+        self.animation_frame_delay = 4
+        self.idle_frame_index = (self.idle_frame_index + 1) % 8
+        self.image = self.idle_direction_dict.get(self.direction)[self.idle_frame_index]
 
     def minus_one_heart(self) -> None:
 
@@ -117,7 +173,9 @@ class Player(pygame.sprite.Sprite):
 
     def run_animation(self) -> None:
 
-        ...
+        self.animation_frame_delay = 2
+        self.run_frame_index = (self.run_frame_index + 1) % 8
+        self.image = self.run_direction_dict.get(self.direction)[self.run_frame_index]
 
     def set_invulnerable(self, duration: int) -> None:
 
@@ -156,4 +214,6 @@ class Player(pygame.sprite.Sprite):
 
     def walk_animation(self) -> None:
 
-        ...
+        self.animation_frame_delay = 4
+        self.walk_frame_index = (self.walk_frame_index + 1) % 8
+        self.image = self.walk_direction_dict.get(self.direction)[self.walk_frame_index]
