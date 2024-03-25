@@ -42,24 +42,6 @@ class Player(pygame.sprite.Sprite):
             sprites_number=8
         ).sprite_surfaces()
 
-        self.front_power_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("front_hero_power"),
-            sprites_size=64,
-            sprites_number=8
-        ).sprite_surfaces()
-
-        self.back_power_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("back_hero_power"),
-            sprites_size=64,
-            sprites_number=8
-        ).sprite_surfaces()
-
-        self.left_power_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("left_hero_power"),
-            sprites_size=64,
-            sprites_number=8
-        ).sprite_surfaces()
-
         self.front_run_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
             sprites_image=self.assets.get("front_hero_run"),
             sprites_size=64,
@@ -106,10 +88,22 @@ class Player(pygame.sprite.Sprite):
         self.invulnerable: bool = False
         self.dead_zone: int = 10
         self.animation_frame_delay: int = 0
-        self.frame_index: int = 0
+        self.idle_frame_index: int = 0
+        self.walk_frame_index: int = 0
+        self.run_frame_index: int = 0
+        self.animation: int = 0
+        self.play_animation: dict = {
+            0: self.idle_animation,
+            1: self.walk_animation,
+            2: self.run_animation
+        }
 
-        self.image = self.front_idle_sprites[self.frame_index]
+        self.image = self.front_idle_sprites[self.idle_frame_index]
         self.rect = pygame.rect.Rect(434, 209, 32, 32)
+
+    def idle_animation(self) -> None:
+
+        ...
 
     def minus_one_heart(self) -> None:
 
@@ -117,9 +111,13 @@ class Player(pygame.sprite.Sprite):
             self.hearts -= 1
 
     @property
-    def now(self):
+    def now(self) -> int:
 
         return pygame.time.get_ticks()
+
+    def run_animation(self) -> None:
+
+        ...
 
     def set_invulnerable(self, duration: int) -> None:
 
@@ -127,14 +125,16 @@ class Player(pygame.sprite.Sprite):
             self.invulnerability_time = self.now + duration
             self.invulnerable = True
 
-    def update(self):
+    def update(self) -> None:
 
         mov_x, mov_y = toolkit.calculate_movement(pygame.mouse.get_pos(), self.rect, self.dead_zone, self.velocity)
         self.rect.move_ip(mov_x, mov_y)
+        self.animation = 0 if (mov_x, mov_y) == (0, 0) else 1
 
         press_run = pygame.mouse.get_pressed()[2]
 
         if press_run and self.stamina > 0:
+            self.animation = 2
             self.velocity = 7
             self.stamina -= 1
         else:
@@ -147,3 +147,13 @@ class Player(pygame.sprite.Sprite):
 
             self.minus_one_heart()
             self.set_invulnerable(duration=1200)
+
+        self.animation_frame_delay -= 1
+
+        if self.animation_frame_delay <= 0:
+
+            self.play_animation[self.animation]()
+
+    def walk_animation(self) -> None:
+
+        ...
