@@ -8,10 +8,11 @@ from pathlib import Path
 from modules import constants
 from modules import toolkit
 from modules.toolkit import Direction as Drc
-from modules.spiders import spider_sprites
+from modules.spiders import spider_sprites, spider_blood_effects
 
 
 player_sprite = pygame.sprite.GroupSingle()
+player_blood_effects = pygame.sprite.Group()
 
 
 class Player(pygame.sprite.Sprite):
@@ -122,6 +123,8 @@ class Player(pygame.sprite.Sprite):
         self.hearts: int = 5
         self.invulnerability_time: int = 0
         self.invulnerable: bool = False
+        self.footprint_duration: int = 0
+        self.footprint_frame_delay: int = 16
         self.dead_zone: int = 10
         self.animation_frame_delay: int = 0
         self.idle_frame_index: int = 0
@@ -138,7 +141,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = pygame.rect.Rect(434, 209, 32, 32)
 
     @property
-    def direction(self) -> toolkit.Direction:
+    def direction(self) -> tuple[toolkit.Direction, toolkit.Direction]:
 
         mouse_position: tuple[int, int] = pygame.mouse.get_pos()
         dx: int = int(mouse_position[0] - self.rect.centerx)
@@ -147,19 +150,26 @@ class Player(pygame.sprite.Sprite):
 
         if direction.value in {315, 270, 225}:
 
-            return Drc.EAST
+            return Drc.EAST, direction
 
         elif direction.value in {45, 90, 135}:
 
-            return Drc.WEST
+            return Drc.WEST, direction
 
-        return direction
+        return direction, direction
+
+    def draw_footprint(self) -> None:
+
+        if self.footprint_duration > 0:
+
+            shoe_print_position: tuple[int, int] = (int(self.rect.centerx), int(self.rect.centery))
+            player_blood_effects.add(ShoePrint(shoe_print_position, self.direction[1]))  # type: ignore
 
     def idle_animation(self) -> None:
 
         self.animation_frame_delay = 4
         self.idle_frame_index = (self.idle_frame_index + 1) % 8
-        self.image = self.idle_direction_dict.get(self.direction)[self.idle_frame_index]
+        self.image = self.idle_direction_dict.get(self.direction[0])[self.idle_frame_index]
 
     def minus_one_heart(self) -> None:
 
@@ -175,7 +185,7 @@ class Player(pygame.sprite.Sprite):
 
         self.animation_frame_delay = 2
         self.run_frame_index = (self.run_frame_index + 1) % 8
-        self.image = self.run_direction_dict.get(self.direction)[self.run_frame_index]
+        self.image = self.run_direction_dict.get(self.direction[0])[self.run_frame_index]
 
     def set_invulnerable(self, duration: int) -> None:
 
@@ -212,8 +222,49 @@ class Player(pygame.sprite.Sprite):
 
             self.play_animation[self.animation]()
 
+        if pygame.sprite.groupcollide(player_sprite, spider_blood_effects, False, False):
+
+            self.footprint_duration = 100
+
+        self.footprint_duration = self.footprint_duration - 1 if self.footprint_duration > 0 else 0
+        self.footprint_frame_delay -= 1
+
+        if self.footprint_frame_delay <= 0:
+
+            self.footprint_frame_delay = 16
+            self.draw_footprint()
+
     def walk_animation(self) -> None:
 
         self.animation_frame_delay = 4
         self.walk_frame_index = (self.walk_frame_index + 1) % 8
-        self.image = self.walk_direction_dict.get(self.direction)[self.walk_frame_index]
+        self.image = self.walk_direction_dict.get(self.direction[0])[self.walk_frame_index]
+
+
+class ShoePrint(pygame.sprite.Sprite):
+
+    def __init__(self, position: tuple[int, int], player_direction: toolkit.Direction):
+        super().__init__()
+
+        shoe_print_file: Path = Path(constants.GRAPHICS_DIR / "player", "shoe_print.png")
+        shoe_print: pygame.Surface = pygame.image.load(shoe_print_file).convert_alpha()
+
+        self.opacity: int = 255
+        self.image = self.process_image(surface=shoe_print, direction=player_direction)
+        self.rect = pygame.rect.Rect(*position, 32, 32)
+
+    @staticmethod
+    def process_image(surface: pygame.Surface, direction: toolkit.Direction) -> pygame.Surface:
+
+        scaled_image: pygame.Surface = pygame.transform.scale(surface, (32, 32))
+        rotated_image: pygame.Surface = pygame.transform.rotate(scaled_image, direction.value)
+
+        return rotated_image
+
+    def update(self):
+
+        self.opacity = self.opacity - 1 if self.opacity > 0 else 0
+        self.image.set_alpha(self.opacity)
+
+        if self.opacity <= 5:
+            self.kill()

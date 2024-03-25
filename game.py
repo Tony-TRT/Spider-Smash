@@ -9,7 +9,7 @@ from pathlib import Path
 from modules import constants
 from modules.menu import GameMenu
 from modules.hud import Hud
-from modules.player import Player, player_sprite
+from modules.player import Player, player_sprite, player_blood_effects
 from modules.spiders import AdultSpider, spider_sprites, spider_blood_effects
 from modules.weapons import Bullet, bullet_sprites
 from modules.toolkit import GameState, load_images
@@ -74,11 +74,12 @@ class Game:
             bullet_sprites.add(
                 Bullet(
                     player_position=(int(self.player.rect.centerx), int(self.player.rect.centery)),
-                    player_direction=self.player.direction
+                    player_direction=self.player.direction[0]
                 )
             )
 
         spider_blood_effects.draw(self.display_surface)
+        player_blood_effects.draw(self.display_surface)
 
         for spider in spider_sprites:
 
@@ -89,6 +90,7 @@ class Game:
         player_sprite.draw(self.display_surface)
 
         spider_blood_effects.update()
+        player_blood_effects.update()
         spider_sprites.update(self.player.rect.center)
         bullet_sprites.update()
         player_sprite.update()
