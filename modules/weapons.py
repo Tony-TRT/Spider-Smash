@@ -8,6 +8,7 @@ from pathlib import Path
 from random import randint
 
 from modules import constants
+from modules.toolkit import Direction
 
 
 bullet_sprites = pygame.sprite.Group()
@@ -20,7 +21,7 @@ class Bullet(pygame.sprite.Sprite):
     Represents a bullet fired by the player.
     """
 
-    def __init__(self, player_position: tuple[int, int]):
+    def __init__(self, player_position: tuple[int, int], player_direction: Direction):
         super().__init__()
 
         self.game_surface: pygame.Surface = pygame.display.get_surface()
@@ -29,7 +30,7 @@ class Bullet(pygame.sprite.Sprite):
         ##############################
 
         self.initial_mouse_position: tuple[int, int] = pygame.mouse.get_pos()
-        self.spawn_position: tuple[int, int] = (player_position[0] - 8, player_position[1] - 8)
+        self.spawn_position: tuple[int, int] = self.set_spawn_position(player_position, player_direction)
         self.speed: int = 20
 
         ##############################
@@ -79,6 +80,14 @@ class Bullet(pygame.sprite.Sprite):
             radius=randint(a=70, b=120),
             width=0
         )
+
+    @staticmethod
+    def set_spawn_position(player_position: tuple[int, int], player_direction: Direction) -> tuple[int, int]:
+
+        x_offset: dict = {Direction.NORTH: 11, Direction.SOUTH: 6, Direction.EAST: 5, Direction.WEST: -6}
+        y_offset: dict = {Direction.NORTH: 4, Direction.SOUTH: 40, Direction.EAST: 5, Direction.WEST: 2}
+
+        return player_position[0] + x_offset[player_direction], player_position[1] + y_offset[player_direction]
 
     def update_position(self) -> None:
         """Updates the position of the bullet on the screen.

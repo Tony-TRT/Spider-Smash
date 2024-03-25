@@ -70,7 +70,13 @@ class Game:
         self.display_surface.blit(self.assets.get("ground"), (0, 0))
 
         if self.keys[pygame.K_SPACE]:
-            bullet_sprites.add(Bullet((int(self.player.rect.centerx), int(self.player.rect.centery))))
+
+            bullet_sprites.add(
+                Bullet(
+                    player_position=(int(self.player.rect.centerx), int(self.player.rect.centery)),
+                    player_direction=self.player.direction
+                )
+            )
 
         spider_blood_effects.draw(self.display_surface)
 
@@ -79,13 +85,13 @@ class Game:
             spider.draw_shadow()
 
         spider_sprites.draw(self.display_surface)
-        player_sprite.draw(self.display_surface)
         bullet_sprites.draw(self.display_surface)
+        player_sprite.draw(self.display_surface)
 
         spider_blood_effects.update()
         spider_sprites.update(self.player.rect.center)
-        player_sprite.update()
         bullet_sprites.update()
+        player_sprite.update()
 
         self.hud.update(self.player.hearts, self.player.stamina)
 
