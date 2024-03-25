@@ -8,7 +8,6 @@ from pathlib import Path
 from modules import constants
 from modules import toolkit
 from modules.spiders import spider_sprites
-from modules.toolkit import load_images, calculate_movement
 
 
 player_sprite = pygame.sprite.GroupSingle()
@@ -23,31 +22,79 @@ class Player(pygame.sprite.Sprite):
         # Assets.
         ##############################
 
-        self.assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "player"), alpha=True)
+        self.assets: dict = toolkit.load_images(folder=Path(constants.GRAPHICS_DIR / "player"), alpha=True)
 
-        self.idle_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("hero_idle"),
-            sprites_size=16,
-            sprites_number=3
-        ).sprite_surfaces(2)
+        self.front_idle_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("front_hero_idle"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
 
-        self.walk_down_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("hero_walk_down"),
-            sprites_size=16,
-            sprites_number=4
-        ).sprite_surfaces(2)
+        self.back_idle_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("back_hero_idle"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
 
-        self.walk_up_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("hero_walk_up"),
-            sprites_size=16,
-            sprites_number=4
-        ).sprite_surfaces(2)
+        self.left_idle_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("left_hero_idle"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
 
-        self.walk_side_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
-            sprites_image=self.assets.get("hero_walk_side"),
-            sprites_size=16,
-            sprites_number=4
-        ).sprite_surfaces(2)
+        self.front_power_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("front_hero_power"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.back_power_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("back_hero_power"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.left_power_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("left_hero_power"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.front_run_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("front_hero_run"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.back_run_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("back_hero_run"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.left_run_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("left_hero_run"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.front_walk_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("front_hero_walk"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.back_walk_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("back_hero_walk"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
+
+        self.left_walk_sprites: list[pygame.Surface] = toolkit.SpritesLoader(
+            sprites_image=self.assets.get("left_hero_walk"),
+            sprites_size=64,
+            sprites_number=8
+        ).sprite_surfaces()
 
         ##############################
 
@@ -61,7 +108,7 @@ class Player(pygame.sprite.Sprite):
         self.animation_frame_delay: int = 0
         self.frame_index: int = 0
 
-        self.image = self.idle_sprites[self.frame_index]
+        self.image = self.front_idle_sprites[self.frame_index]
         self.rect = pygame.rect.Rect(434, 209, 32, 32)
 
     def minus_one_heart(self) -> None:
@@ -82,7 +129,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
 
-        mov_x, mov_y = calculate_movement(pygame.mouse.get_pos(), self.rect, self.dead_zone, self.velocity)
+        mov_x, mov_y = toolkit.calculate_movement(pygame.mouse.get_pos(), self.rect, self.dead_zone, self.velocity)
         self.rect.move_ip(mov_x, mov_y)
 
         press_run = pygame.mouse.get_pressed()[2]
