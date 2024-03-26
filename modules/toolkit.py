@@ -119,6 +119,16 @@ def get_direction(dx, dy, margin: int = 60) -> Direction:
     return Direction.NONE
 
 
+def get_shadow_surface(surface: pygame.Surface) -> pygame.Surface:
+
+    shadow_surface: pygame.Surface = surface.copy()
+    black_surface: pygame.Surface = pygame.Surface(shadow_surface.get_size(), pygame.SRCALPHA)
+    black_surface.fill((0, 0, 0, 150))
+    shadow_surface.blit(black_surface, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+    return shadow_surface
+
+
 def load_images(folder: Path, alpha: bool = False) -> dict:
     """Load images from a specified folder.
 

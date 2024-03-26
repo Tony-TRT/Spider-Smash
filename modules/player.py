@@ -165,6 +165,11 @@ class Player(pygame.sprite.Sprite):
             shoe_print_position: tuple[int, int] = (int(self.rect.centerx), int(self.rect.centery))
             player_blood_effects.add(ShoePrint(shoe_print_position, self.direction[1]))  # type: ignore
 
+    def draw_shadow(self) -> None:
+
+        player_shadow: pygame.Surface = toolkit.get_shadow_surface(self.image)
+        self.game_surface.blit(player_shadow, (self.rect.x - 4, self.rect.y + 4))
+
     def idle_animation(self) -> None:
 
         self.animation_frame_delay = 4
