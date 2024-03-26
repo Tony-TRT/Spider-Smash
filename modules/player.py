@@ -216,7 +216,7 @@ class Player(pygame.sprite.Sprite):
 
         self.invulnerable = False if self.invulnerability_time <= self.now else self.invulnerable
 
-        if pygame.sprite.groupcollide(player_sprite, spider_sprites, False, False):
+        if toolkit.detect_collision(player_sprite, spider_sprites, False, False):
 
             self.minus_one_heart()
             self.set_invulnerable(duration=1200)

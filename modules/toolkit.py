@@ -3,6 +3,7 @@ This module contains useful elements that can be used several times.
 """
 
 import pygame
+from pygame.sprite import collide_mask, AbstractGroup
 from pygame.rect import Rect
 from pathlib import Path
 from math import sqrt
@@ -71,6 +72,17 @@ class Direction(Enum):
     SOUTHWEST = 135
     WEST = 90
     NONE = 0
+
+
+def detect_collision(group_a: AbstractGroup, group_b: AbstractGroup, kill_a: bool, kill_b: bool) -> bool:
+
+    if not pygame.sprite.groupcollide(group_a, group_b, False, False):
+
+        return False
+
+    if pygame.sprite.groupcollide(group_a, group_b, kill_a, kill_b, collide_mask):  # type: ignore
+
+        return True
 
 
 def get_direction(dx, dy, margin: int = 60) -> Direction:

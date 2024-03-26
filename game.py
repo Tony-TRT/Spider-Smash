@@ -12,7 +12,7 @@ from modules.hud import Hud
 from modules.player import Player, player_sprite, player_blood_effects
 from modules.spiders import AdultSpider, spider_sprites, spider_blood_effects
 from modules.weapons import Bullet, bullet_sprites
-from modules.toolkit import GameState, load_images
+from modules.toolkit import GameState, load_images, detect_collision
 
 
 class Game:
@@ -71,12 +71,9 @@ class Game:
 
         if self.keys[pygame.K_SPACE]:
 
-            bullet_sprites.add(
-                Bullet(
-                    player_position=(int(self.player.rect.centerx), int(self.player.rect.centery)),
-                    player_direction=self.player.direction[0]
-                )
-            )
+            position: tuple[int, int] = (int(self.player.rect.centerx), int(self.player.rect.centery))
+            bullet: Bullet = Bullet(player_position=position, player_direction=self.player.direction[0])
+            bullet_sprites.add(bullet)
 
         spider_blood_effects.draw(self.display_surface)
         player_blood_effects.draw(self.display_surface)
@@ -99,7 +96,7 @@ class Game:
 
         self.hud.update(self.player.hearts, self.player.stamina)
 
-        pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
+        detect_collision(bullet_sprites, spider_sprites, True, True)
 
         self.state = GameState.OVER if not self.player.hearts else self.state
 

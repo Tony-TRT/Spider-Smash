@@ -100,7 +100,7 @@ class Spider(pygame.sprite.Sprite):
 
     def update(self, player_position: tuple[int, int]) -> None:
 
-        mov_x, mov_y = toolkit.calculate_movement(player_position, self.rect, 15, self.velocity)
+        mov_x, mov_y = toolkit.calculate_movement(player_position, self.rect, 10, self.velocity)
         self.rect.move_ip(mov_x, mov_y)
 
         self.animation_frame_delay -= 1
