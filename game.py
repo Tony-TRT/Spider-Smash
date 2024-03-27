@@ -8,10 +8,11 @@ from pathlib import Path
 
 from modules import constants
 from modules.menu import GameMenu
-from modules.player import Player, player_sprite
-from modules.spiders import AdultSpider, spider_sprites
+from modules.hud import Hud
+from modules.player import Player, player_sprite, player_blood_effects
+from modules.spiders import AdultSpider, spider_sprites, spider_blood_effects
 from modules.weapons import Bullet, bullet_sprites
-from modules.toolkit import GameState, load_images
+from modules.toolkit import GameState, load_images, detect_collision
 
 
 class Game:
@@ -47,6 +48,7 @@ class Game:
 
         self.player = Player()
         self.menu = GameMenu()
+        self.hud = Hud()
 
         player_sprite.add(self.player)
 
@@ -55,8 +57,12 @@ class Game:
         ##############################
 
         self.event_spider_spawn = pygame.USEREVENT + 1
+        self.event_score_second = pygame.USEREVENT + 2
+        self.event_score_minute = pygame.USEREVENT + 3
 
-        pygame.time.set_timer(self.event_spider_spawn, 500)
+        pygame.time.set_timer(self.event_spider_spawn, 400)
+        pygame.time.set_timer(self.event_score_second, 1000)
+        pygame.time.set_timer(self.event_score_minute, 60000)
 
     def display_menu(self) -> None:
 
@@ -68,19 +74,34 @@ class Game:
         self.display_surface.blit(self.assets.get("ground"), (0, 0))
 
         if self.keys[pygame.K_SPACE]:
-            bullet_sprites.add(Bullet(self.player.rect.center))
+
+            position: tuple[int, int] = (int(self.player.rect.centerx), int(self.player.rect.centery))
+            bullet: Bullet = Bullet(player_position=position, player_direction=self.player.direction[0])
+            bullet_sprites.add(bullet)
+
+        spider_blood_effects.draw(self.display_surface)
+        player_blood_effects.draw(self.display_surface)
+
+        for spider in spider_sprites:
+
+            spider.draw_shadow()
+
+        self.player.draw_shadow()
 
         spider_sprites.draw(self.display_surface)
-        player_sprite.draw(self.display_surface)
         bullet_sprites.draw(self.display_surface)
+        player_sprite.draw(self.display_surface)
 
+        spider_blood_effects.update()
+        player_blood_effects.update()
         spider_sprites.update(self.player.rect.center)
-        player_sprite.update()
         bullet_sprites.update()
+        player_sprite.update()
 
-        self.player.display_hud()
+        self.hud.update(self.player.hearts, self.player.stamina)
 
-        pygame.sprite.groupcollide(bullet_sprites, spider_sprites, True, True)
+        if detect_collision(bullet_sprites, spider_sprites, True, True):
+            self.hud.player_score += 5
 
         self.state = GameState.OVER if not self.player.hearts else self.state
 
@@ -105,6 +126,12 @@ class Game:
 
         if self.event_spider_spawn in events and self.state == GameState.ACTIVE:
             spider_sprites.add(AdultSpider())
+
+        if self.event_score_second in events and self.state == GameState.ACTIVE:
+            self.hud.player_score += 1
+
+        if self.event_score_minute in events and self.state == GameState.ACTIVE:
+            self.hud.player_score += 100
 
     @property
     def keys(self):
