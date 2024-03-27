@@ -24,6 +24,7 @@ class Game:
         ##############################
 
         pygame.init()
+        pygame.mixer.init()
 
         self.display_surface = pygame.display.set_mode((900, 450))
         self.clock = pygame.time.Clock()
@@ -35,6 +36,9 @@ class Game:
         ##############################
 
         self.assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "general"))
+        self.game_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "general" / "game_music.ogg"))
+        self.game_music.set_volume(0.2)
+        self.do_game_music: bool = True
         self.state = GameState.MENU
         self.game_state_action: dict = {
             GameState.ACTIVE: self.do_game,
@@ -60,7 +64,7 @@ class Game:
         self.event_score_second = pygame.USEREVENT + 2
         self.event_score_minute = pygame.USEREVENT + 3
 
-        pygame.time.set_timer(self.event_spider_spawn, 400)
+        pygame.time.set_timer(self.event_spider_spawn, 350)
         pygame.time.set_timer(self.event_score_second, 1000)
         pygame.time.set_timer(self.event_score_minute, 60000)
 
@@ -70,6 +74,11 @@ class Game:
         self.menu.update()
 
     def do_game(self) -> None:
+
+        if self.do_game_music:
+
+            self.game_music.play(-1)
+            self.do_game_music = False
 
         self.display_surface.blit(self.assets.get("ground"), (0, 0))
 
@@ -106,6 +115,8 @@ class Game:
         self.state = GameState.OVER if not self.player.hearts else self.state
 
     def do_game_over(self) -> None:
+
+        self.game_music.stop()
 
         self.display_surface.fill((0, 0, 0))
 

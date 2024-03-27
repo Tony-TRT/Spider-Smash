@@ -4,6 +4,7 @@ Contains everything related to the playable character.
 
 import pygame
 from pathlib import Path
+from random import choice
 
 from modules import constants
 from modules import toolkit
@@ -92,6 +93,12 @@ class Player(pygame.sprite.Sprite):
             pygame.transform.flip(surface, True, False) for surface in self.left_walk_sprites
         ]
 
+        self.bite_sound = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "spiders", "spider_bite.wav"))
+        self.bite_sound.set_volume(0.4)
+        self.blood_steps = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "player", "blood_footsteps.wav"))
+        self.blood_steps_02 = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "player", "blood_footsteps_02.wav"))
+        self.footsteps_sound: list = [self.blood_steps, self.blood_steps_02]
+
         ##############################
 
         self.idle_direction_dict: dict = {
@@ -124,6 +131,7 @@ class Player(pygame.sprite.Sprite):
         self.invulnerability_time: int = 0
         self.invulnerable: bool = False
         self.footprint_duration: int = 0
+        self.footsteps_sound_delay: int = 100
         self.footprint_frame_delay: int = 16
         self.dead_zone: int = 10
         self.animation_frame_delay: int = 0
@@ -179,6 +187,7 @@ class Player(pygame.sprite.Sprite):
     def minus_one_heart(self) -> None:
 
         if self.hearts and not self.invulnerable:
+            self.bite_sound.play()
             self.hearts -= 1
 
     @property
@@ -230,6 +239,13 @@ class Player(pygame.sprite.Sprite):
         if pygame.sprite.groupcollide(player_sprite, spider_blood_effects, False, False):
 
             self.footprint_duration = 100
+            self.footsteps_sound_delay = 100 if self.footsteps_sound_delay <= 0 else self.footsteps_sound_delay
+
+            if not self.footsteps_sound_delay % 20 and self.animation == 1:
+
+                choice(self.footsteps_sound).play()
+
+        self.footsteps_sound_delay -= 1
 
         self.footprint_duration = self.footprint_duration - 1 if self.footprint_duration > 0 else 0
         self.footprint_frame_delay -= 1
