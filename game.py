@@ -57,8 +57,12 @@ class Game:
         ##############################
 
         self.event_spider_spawn = pygame.USEREVENT + 1
+        self.event_score_second = pygame.USEREVENT + 2
+        self.event_score_minute = pygame.USEREVENT + 3
 
         pygame.time.set_timer(self.event_spider_spawn, 400)
+        pygame.time.set_timer(self.event_score_second, 1000)
+        pygame.time.set_timer(self.event_score_minute, 60000)
 
     def display_menu(self) -> None:
 
@@ -96,7 +100,8 @@ class Game:
 
         self.hud.update(self.player.hearts, self.player.stamina)
 
-        detect_collision(bullet_sprites, spider_sprites, True, True)
+        if detect_collision(bullet_sprites, spider_sprites, True, True):
+            self.hud.player_score += 5
 
         self.state = GameState.OVER if not self.player.hearts else self.state
 
@@ -121,6 +126,12 @@ class Game:
 
         if self.event_spider_spawn in events and self.state == GameState.ACTIVE:
             spider_sprites.add(AdultSpider())
+
+        if self.event_score_second in events and self.state == GameState.ACTIVE:
+            self.hud.player_score += 1
+
+        if self.event_score_minute in events and self.state == GameState.ACTIVE:
+            self.hud.player_score += 100
 
     @property
     def keys(self):

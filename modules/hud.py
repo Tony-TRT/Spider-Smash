@@ -19,6 +19,8 @@ class Hud:
         self.hud_surface: pygame.Surface = pygame.Surface((900, 450), pygame.SRCALPHA, 32).convert_alpha()
 
         self.player_hearts: int = 0
+        self.player_score: int = 0
+        self.score_font = pygame.font.Font(Path(constants.ASSETS_DIR / "font" / "font.otf"), 16)
         self.heart_rectangles = None
         self.stamina_rectangle = None
 
@@ -72,5 +74,11 @@ class Hud:
         for heart in self.heart_rectangles:
 
             self.hud_surface.blit(self.animate_hearts(), heart)
+
+        # Display score.
+        score_str: str = f"Score: {str(self.player_score)}"
+        score = self.score_font.render(score_str, True, (255, 255, 255))
+        score_rectangle = score.get_rect(bottomleft=(20, 430))
+        self.hud_surface.blit(score, score_rectangle)
 
         self.game_surface.blit(self.hud_surface, (0, 0))
