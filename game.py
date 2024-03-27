@@ -39,6 +39,8 @@ class Game:
         self.game_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "general" / "game_music.ogg"))
         self.game_music.set_volume(0.2)
         self.do_game_music: bool = True
+        self.game_over_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "general" / "game_over.wav"))
+        self.do_game_over_music: bool = True
         self.state = GameState.MENU
         self.game_state_action: dict = {
             GameState.ACTIVE: self.do_game,
@@ -117,6 +119,11 @@ class Game:
     def do_game_over(self) -> None:
 
         self.game_music.stop()
+
+        if self.do_game_over_music:
+
+            self.game_over_music.play()
+            self.do_game_over_music = False
 
         self.display_surface.fill((0, 0, 0))
 
