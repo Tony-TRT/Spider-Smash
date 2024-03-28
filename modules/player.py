@@ -209,7 +209,13 @@ class Player(pygame.sprite.Sprite):
 
     def update(self) -> None:
 
-        mov_x, mov_y = toolkit.calculate_movement(pygame.mouse.get_pos(), self.rect, self.dead_zone, self.velocity)
+        mov_x, mov_y = toolkit.calculate_movement(
+            destination=pygame.mouse.get_pos(),
+            rect_xy=(int(self.rect.centerx), int(self.rect.centery)),
+            dead_zone=self.dead_zone,
+            velocity=self.velocity
+        )
+
         self.rect.move_ip(mov_x, mov_y)
         self.animation = 0 if (mov_x, mov_y) == (0, 0) else 1
 
