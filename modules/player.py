@@ -93,8 +93,14 @@ class Player(pygame.sprite.Sprite):
             pygame.transform.flip(surface, True, False) for surface in self.left_walk_sprites
         ]
 
-        self.bite_sound = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "spiders", "spider_bite.wav"))
-        self.bite_sound.set_volume(0.4)
+        self.bite_sounds: list = [
+            pygame.mixer.Sound(Path(constants.AUDIO_DIR / "spiders", f"spider_bite_0{i}.ogg")) for i in range(1, 3)
+        ]
+
+        for bite_sound in self.bite_sounds:
+
+            bite_sound.set_volume(0.4)
+
         self.blood_steps = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "player", "blood_footsteps.wav"))
         self.blood_steps_02 = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "player", "blood_footsteps_02.wav"))
         self.footsteps_sound: list = [self.blood_steps, self.blood_steps_02]
@@ -187,7 +193,7 @@ class Player(pygame.sprite.Sprite):
     def minus_one_heart(self) -> None:
 
         if self.hearts and not self.invulnerable:
-            self.bite_sound.play()
+            choice(self.bite_sounds).play()
             self.hearts -= 1
 
     @property

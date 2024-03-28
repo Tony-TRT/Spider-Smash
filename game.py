@@ -41,6 +41,11 @@ class Game:
         self.do_game_music: bool = True
         self.game_over_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "general" / "game_over.wav"))
         self.do_game_over_music: bool = True
+        self.game_menu_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "menu" / "game_menu.ogg"))
+        self.game_menu_music.set_volume(0.2)
+        self.do_game_menu_music: bool = True
+        self.start_sound = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "menu" / "start.wav"))
+        self.start_sound.set_volume(0.35)
         self.state = GameState.MENU
         self.game_state_action: dict = {
             GameState.ACTIVE: self.do_game,
@@ -71,6 +76,11 @@ class Game:
         pygame.time.set_timer(self.event_score_minute, 60000)
 
     def display_menu(self) -> None:
+
+        if self.do_game_menu_music:
+
+            self.game_menu_music.play(-1)
+            self.do_game_menu_music = False
 
         self.menu.display()
         self.menu.update()
@@ -132,6 +142,9 @@ class Game:
         self.display_menu()
 
         if self.keys[pygame.K_SPACE]:
+
+            self.game_menu_music.stop()
+            self.start_sound.play()
             self.state = GameState.ACTIVE
 
     def handle_events(self) -> None:
