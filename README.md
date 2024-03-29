@@ -2,7 +2,7 @@
 
 <br>
 
-![Preview](https://github.com/Tony-TRT/Spider-Smash/blob/last-tweaks/preview.gif "Short preview")
+![Preview](https://github.com/Tony-TRT/Spider-Smash/blob/main/preview.gif "Short preview")
 
 <br>
 
@@ -24,4 +24,6 @@ The player follows and shoots in the direction of the mouse. To shoot, press spa
 For anyone interested passing by, I've compiled an executable to make testing the 'game' easy.<br>
 I used PyInstaller for this, and despite compiling it for my system, the Jiangmin antivirus still shows a false positive.<br>
 Additionally, on VirusTotal, Jiangmin is the only detection out of 71 antivirus engines.<br>
-So, if you don't feel like setting up a virtual environment and installing all the modules, the executable is here 🙂
+So, if you don't feel like setting up a virtual environment and installing all the modules, the executable is available at the link below 🙂
+
+https://github.com/Tony-TRT/Spider-Smash/releases/download/v1.0/SpiderSmash.exe
