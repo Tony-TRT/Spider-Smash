@@ -21,6 +21,14 @@ class Spider(pygame.sprite.Sprite):
 
         self.game_surface: pygame.Surface = pygame.display.get_surface()
 
+        self.death_sounds: list = [
+            pygame.mixer.Sound(Path(constants.AUDIO_DIR / "spiders", f"spider_death_0{i}.wav")) for i in range(1, 6)
+        ]
+
+        for death_sound in self.death_sounds:
+
+            death_sound.set_volume(0.3)
+
         self.velocity: int = 0
         self.spawn_position: tuple[int, int]
         self.direction: toolkit.Direction = toolkit.Direction.NONE
@@ -93,6 +101,7 @@ class Spider(pygame.sprite.Sprite):
 
     def kill(self):
 
+        choice(self.death_sounds).play()
         spider_blood_effects.add(SpiderBloodSplat(position=self.rect.center))   # type: ignore
         spider_blood_effects.add(SpiderBloodSplash(position=self.rect.center))  # type: ignore
 
@@ -100,7 +109,13 @@ class Spider(pygame.sprite.Sprite):
 
     def update(self, player_position: tuple[int, int]) -> None:
 
-        mov_x, mov_y = toolkit.calculate_movement(player_position, self.rect, 10, self.velocity)
+        mov_x, mov_y = toolkit.calculate_movement(
+            destination=player_position,
+            rect_xy=(int(self.rect.centerx), int(self.rect.centery)),
+            dead_zone=10,
+            velocity=self.velocity
+        )
+
         self.rect.move_ip(mov_x, mov_y)
 
         self.animation_frame_delay -= 1

@@ -4,10 +4,10 @@ This module contains useful elements that can be used several times.
 
 import pygame
 from pygame.sprite import collide_mask, AbstractGroup
-from pygame.rect import Rect
 from pathlib import Path
 from math import sqrt
 from enum import Enum, auto
+from numba import jit
 
 
 class SpritesLoader:
@@ -85,6 +85,7 @@ def detect_collision(group_a: AbstractGroup, group_b: AbstractGroup, kill_a: boo
         return True
 
 
+@jit(nopython=True)
 def get_direction(dx, dy, margin: int = 60) -> Direction:
     """Determine the direction of movement based on horizontal and vertical components.
 
@@ -159,12 +160,19 @@ def load_images(folder: Path, alpha: bool = False) -> dict:
     }
 
 
-def calculate_movement(destination: tuple[int, int], rect: Rect, dead_zone: int, velocity: int) -> tuple[float, float]:
+@jit(nopython=True)
+def calculate_movement(
+        destination: tuple[int, int],
+        rect_xy: tuple[int, int],
+        dead_zone: int,
+        velocity: int
+) -> tuple[float, float]:
     """Calculate the movement required to reach a destination point.
 
     Args:
         destination (tuple[int, int]): The target coordinates (x, y) to move towards.
-        rect (Rect): The rectangle representing the current position and size of the object.
+        rect_xy (tuple[int, int]): The coordinates of the rectangle representing the current
+        position and size of the object.
         dead_zone (int): The radius within which no movement is necessary.
         velocity (int): The speed at which the object should move.
 
@@ -176,8 +184,8 @@ def calculate_movement(destination: tuple[int, int], rect: Rect, dead_zone: int,
 
     # Calculate the horizontal and vertical differences
     # between the destination position and the center of the rectangle.
-    dx = destination[0] - rect.centerx
-    dy = destination[1] - rect.centery
+    dx = destination[0] - rect_xy[0]
+    dy = destination[1] - rect_xy[1]
 
     # Calculate the distance between the destination and
     # the center of the rectangle using the Pythagorean theorem.

@@ -24,6 +24,7 @@ class Game:
         ##############################
 
         pygame.init()
+        pygame.mixer.init()
 
         self.display_surface = pygame.display.set_mode((900, 450))
         self.clock = pygame.time.Clock()
@@ -35,6 +36,16 @@ class Game:
         ##############################
 
         self.assets: dict = load_images(folder=Path(constants.GRAPHICS_DIR / "general"))
+        self.game_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "general" / "game_music.ogg"))
+        self.game_music.set_volume(0.2)
+        self.do_game_music: bool = True
+        self.game_over_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "general" / "game_over.wav"))
+        self.do_game_over_music: bool = True
+        self.game_menu_music = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "menu" / "game_menu.ogg"))
+        self.game_menu_music.set_volume(0.2)
+        self.do_game_menu_music: bool = True
+        self.start_sound = pygame.mixer.Sound(Path(constants.AUDIO_DIR / "menu" / "start.wav"))
+        self.start_sound.set_volume(0.35)
         self.state = GameState.MENU
         self.game_state_action: dict = {
             GameState.ACTIVE: self.do_game,
@@ -60,16 +71,26 @@ class Game:
         self.event_score_second = pygame.USEREVENT + 2
         self.event_score_minute = pygame.USEREVENT + 3
 
-        pygame.time.set_timer(self.event_spider_spawn, 400)
+        pygame.time.set_timer(self.event_spider_spawn, 350)
         pygame.time.set_timer(self.event_score_second, 1000)
         pygame.time.set_timer(self.event_score_minute, 60000)
 
     def display_menu(self) -> None:
 
+        if self.do_game_menu_music:
+
+            self.game_menu_music.play(-1)
+            self.do_game_menu_music = False
+
         self.menu.display()
         self.menu.update()
 
     def do_game(self) -> None:
+
+        if self.do_game_music:
+
+            self.game_music.play(-1)
+            self.do_game_music = False
 
         self.display_surface.blit(self.assets.get("ground"), (0, 0))
 
@@ -107,6 +128,13 @@ class Game:
 
     def do_game_over(self) -> None:
 
+        self.game_music.stop()
+
+        if self.do_game_over_music:
+
+            self.game_over_music.play()
+            self.do_game_over_music = False
+
         self.display_surface.fill((0, 0, 0))
 
     def do_menu(self) -> None:
@@ -114,6 +142,9 @@ class Game:
         self.display_menu()
 
         if self.keys[pygame.K_SPACE]:
+
+            self.game_menu_music.stop()
+            self.start_sound.play()
             self.state = GameState.ACTIVE
 
     def handle_events(self) -> None:
