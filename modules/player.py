@@ -136,6 +136,7 @@ class Player(pygame.sprite.Sprite):
         self.hearts: int = 5
         self.invulnerability_time: int = 0
         self.invulnerable: bool = False
+        self.blood_overlay_opacity: int = 0
         self.footprint_duration: int = 0
         self.footsteps_sound_delay: int = 100
         self.footprint_frame_delay: int = 16
@@ -193,7 +194,10 @@ class Player(pygame.sprite.Sprite):
     def minus_one_heart(self) -> None:
 
         if self.hearts and not self.invulnerable:
+
             choice(self.bite_sounds).play()
+            self.blood_overlay_opacity: int = 255
+            toolkit.shake_screen(surface=self.game_surface)
             self.hearts -= 1
 
     @property
@@ -214,6 +218,10 @@ class Player(pygame.sprite.Sprite):
             self.invulnerable = True
 
     def update(self) -> None:
+
+        self.assets.get("blood_overlay").set_alpha(self.blood_overlay_opacity)
+        self.game_surface.blit(self.assets.get("blood_overlay"), (0, 0))
+        self.blood_overlay_opacity -= 1
 
         mov_x, mov_y = toolkit.calculate_movement(
             destination=pygame.mouse.get_pos(),
