@@ -4,6 +4,7 @@ This module contains useful elements that can be used several times.
 
 import pygame
 from pygame.sprite import collide_mask, AbstractGroup
+from random import randint
 from pathlib import Path
 from math import sqrt
 from enum import Enum, auto
@@ -195,3 +196,14 @@ def calculate_movement(
     if distance > dead_zone:
         return dx / distance * velocity, dy / distance * velocity
     return 0, 0
+
+
+def shake_screen(surface: pygame.Surface):
+
+    for _ in range(20):
+
+        mov_x = randint(a=-5, b=5)
+        mov_y = randint(a=-5, b=5)
+        surface.scroll(mov_x, mov_y)
+        pygame.display.flip()
+        pygame.time.wait(20)
