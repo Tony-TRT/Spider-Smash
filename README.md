@@ -16,7 +16,8 @@ and come from websites such as itch.io or opengameart.org. You can use this proj
 <br>
 
 ## Controls 🕹️
-The player follows and shoots in the direction of the mouse. To shoot, press space, to sprint use the right mouse click.
+The player follows and shoots in the direction of the mouse.
+To shoot, press space, to sprint use the right mouse click.
 
 <br>
 
@@ -24,6 +25,6 @@ The player follows and shoots in the direction of the mouse. To shoot, press spa
 For anyone interested passing by, I've compiled an executable to make testing the 'game' easy.
 I used PyInstaller for this, and despite compiling it for my system, the Jiangmin antivirus still shows a false positive.
 Additionally, on VirusTotal, Jiangmin is the only detection out of 71 antivirus engines.
-So, if you trust me enough and want to avoid installing the necessary modules, the executable is available at the link below 😙
+So, if you can trust a random guy enough and want to avoid installing the necessary modules, the executable is available at the link below 😙
 
 https://github.com/Tony-TRT/Spider-Smash/releases/download/v1.0/SpiderSmash.exe
