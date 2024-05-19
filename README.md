@@ -7,7 +7,7 @@
 <br>
 
 ## Description 📖
-Spider Smash is a game written in Python using the Pygame library. This project is primarily an introduction to Pygame where I
+Spider Smash is a basic game written in Python using the Pygame library. This project is primarily an introduction to Pygame where I
 tested and learned a lot of things, rather than a finished and polished project. The game itself is relatively simple and quickly
 becomes boring because it doesn't really present a real challenge. Some parts, like the game over screen for example, haven't
 been added because I didn't see anything interesting to learn from it. All graphics and audio assets are completely royalty-free
